@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.SiteZoneMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.SiteZone">
+    <id column="id" jdbcType="SMALLINT" property="id" />
+    <result column="fk_site_id" jdbcType="SMALLINT" property="fkSiteId" />
+    <result column="display_name" jdbcType="VARCHAR" property="displayName" />
+    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="disabled" jdbcType="BIT" property="disabled" />
+    <result column="rank" jdbcType="SMALLINT" property="rank" />
+    <result column="coordinate" jdbcType="VARCHAR" property="coordinate" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_site_id, display_name, type, disabled, rank, coordinate, description
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Short" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from site_zone
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Short">
+    delete from site_zone
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="net.iretailer.rest.model.SiteZone">
+    insert into site_zone (id, fk_site_id, display_name, 
+      type, disabled, rank, 
+      coordinate, description)
+    values (#{id,jdbcType=SMALLINT}, #{fkSiteId,jdbcType=SMALLINT}, #{displayName,jdbcType=VARCHAR}, 
+      #{type,jdbcType=TINYINT}, #{disabled,jdbcType=BIT}, #{rank,jdbcType=SMALLINT}, 
+      #{coordinate,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="net.iretailer.rest.model.SiteZone">
+    insert into site_zone
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkSiteId != null">
+        fk_site_id,
+      </if>
+      <if test="displayName != null">
+        display_name,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="disabled != null">
+        disabled,
+      </if>
+      <if test="rank != null">
+        rank,
+      </if>
+      <if test="coordinate != null">
+        coordinate,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=SMALLINT},
+      </if>
+      <if test="fkSiteId != null">
+        #{fkSiteId,jdbcType=SMALLINT},
+      </if>
+      <if test="displayName != null">
+        #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=TINYINT},
+      </if>
+      <if test="disabled != null">
+        #{disabled,jdbcType=BIT},
+      </if>
+      <if test="rank != null">
+        #{rank,jdbcType=SMALLINT},
+      </if>
+      <if test="coordinate != null">
+        #{coordinate,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.iretailer.rest.model.SiteZone">
+    update site_zone
+    <set>
+      <if test="fkSiteId != null">
+        fk_site_id = #{fkSiteId,jdbcType=SMALLINT},
+      </if>
+      <if test="displayName != null">
+        display_name = #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=TINYINT},
+      </if>
+      <if test="disabled != null">
+        disabled = #{disabled,jdbcType=BIT},
+      </if>
+      <if test="rank != null">
+        rank = #{rank,jdbcType=SMALLINT},
+      </if>
+      <if test="coordinate != null">
+        coordinate = #{coordinate,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.iretailer.rest.model.SiteZone">
+    update site_zone
+    set fk_site_id = #{fkSiteId,jdbcType=SMALLINT},
+      display_name = #{displayName,jdbcType=VARCHAR},
+      type = #{type,jdbcType=TINYINT},
+      disabled = #{disabled,jdbcType=BIT},
+      rank = #{rank,jdbcType=SMALLINT},
+      coordinate = #{coordinate,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <select id="selectSiteZoneBySiteId" parameterType="java.lang.Short" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from site_zone
+    where fk_site_id = #{siteId,jdbcType=SMALLINT}
+  </select>
+  <delete id="deleteSitezones" parameterType="java.lang.Short">
+    delete from site_zone
+    where id in
+        <foreach collection="array" item="ids" index="index"
+            open="(" close=")" separator=",">
+            #{ids}
+        </foreach>
+  </delete>
+  <select id="selectAllSiteZoneName" parameterType="java.util.Map" resultType="java.util.Map" >
+  	select distinct(display_name) as displayName,id as id from site_zone where fk_site_id=#{siteId,jdbcType=INTEGER} and type=#{sitezoneType,jdbcType=INTEGER}
+  </select>
+</mapper>

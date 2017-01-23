@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.LocationMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.Location">
+    <id column="id" jdbcType="SMALLINT" property="id" />
+    <result column="parent_id" jdbcType="SMALLINT" property="parentId" />
+    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="getweather" jdbcType="BIT" property="getweather" />
+    <result column="rank" jdbcType="SMALLINT" property="rank" />
+    <result column="_name" jdbcType="VARCHAR" property="name" />
+    <result column="display_name" jdbcType="VARCHAR" property="displayName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, parent_id, type, getweather, rank, _name, display_name
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Short" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from location
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Short">
+    delete from location
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="net.iretailer.rest.model.Location">
+    insert into location (id, parent_id, type, 
+      getweather, rank, _name, 
+      display_name)
+    values (#{id,jdbcType=SMALLINT}, #{parentId,jdbcType=SMALLINT}, #{type,jdbcType=TINYINT}, 
+      #{getweather,jdbcType=BIT}, #{rank,jdbcType=SMALLINT}, #{name,jdbcType=VARCHAR}, 
+      #{displayName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="net.iretailer.rest.model.Location">
+    insert into location
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="parentId != null">
+        parent_id,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="getweather != null">
+        getweather,
+      </if>
+      <if test="rank != null">
+        rank,
+      </if>
+      <if test="name != null">
+        _name,
+      </if>
+      <if test="displayName != null">
+        display_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=SMALLINT},
+      </if>
+      <if test="parentId != null">
+        #{parentId,jdbcType=SMALLINT},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=TINYINT},
+      </if>
+      <if test="getweather != null">
+        #{getweather,jdbcType=BIT},
+      </if>
+      <if test="rank != null">
+        #{rank,jdbcType=SMALLINT},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="displayName != null">
+        #{displayName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.iretailer.rest.model.Location">
+    update location
+    <set>
+      <if test="parentId != null">
+        parent_id = #{parentId,jdbcType=SMALLINT},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=TINYINT},
+      </if>
+      <if test="getweather != null">
+        getweather = #{getweather,jdbcType=BIT},
+      </if>
+      <if test="rank != null">
+        rank = #{rank,jdbcType=SMALLINT},
+      </if>
+      <if test="name != null">
+        _name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="displayName != null">
+        display_name = #{displayName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.iretailer.rest.model.Location">
+    update location
+    set parent_id = #{parentId,jdbcType=SMALLINT},
+      type = #{type,jdbcType=TINYINT},
+      getweather = #{getweather,jdbcType=BIT},
+      rank = #{rank,jdbcType=SMALLINT},
+      _name = #{name,jdbcType=VARCHAR},
+      display_name = #{displayName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from location order by parent_id
+  </select>
+  <select id="selectAllLocationName" parameterType="java.util.Map" resultType="java.util.Map" >
+	SELECT DISTINCT
+	(
+		IFNULL(
+			CASE #{locationType,jdbcType=INTEGER}
+			WHEN 0 THEN
+				quare_name
+			WHEN 1 THEN
+				province_name
+			WHEN 2 THEN
+				city_name
+			WHEN 3 THEN
+				county_name
+			END,
+			'未分类'
+		)
+	) AS displayName,
+	IFNULL(
+		CASE #{locationType,jdbcType=INTEGER}
+		WHEN 0 THEN
+			quare_id
+		WHEN 1 THEN
+			province_id
+		WHEN 2 THEN
+			city_id
+		WHEN 3 THEN
+			county_id
+		END,
+		0
+	) AS id
+FROM location_tmp
+INNER JOIN site
+on location_tmp.id = site.fk_location_id
+WHERE
+	site.parent_id = #{siteId,jdbcType=INTEGER}
+  </select>
+</mapper>

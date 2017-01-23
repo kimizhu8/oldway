@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.OpeningTimeTmpMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.OpeningTimeTmp">
+    <id column="fk_site_id" jdbcType="SMALLINT" property="fkSiteId" />
+    <id column="date" jdbcType="DATE" property="date" />
+    <result column="start_time" jdbcType="TIME" property="startTime" />
+    <result column="end_time" jdbcType="TIME" property="endTime" />
+    <result column="display_name" jdbcType="VARCHAR" property="displayName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    fk_site_id, date, start_time, end_time, display_name
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="net.iretailer.rest.model.OpeningTimeTmpKey" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from opening_time_tmp
+    where fk_site_id = #{fkSiteId,jdbcType=SMALLINT}
+      and date = #{date,jdbcType=DATE}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="net.iretailer.rest.model.OpeningTimeTmpKey">
+    delete from opening_time_tmp
+    where fk_site_id = #{fkSiteId,jdbcType=SMALLINT}
+      and date = #{date,jdbcType=DATE}
+  </delete>
+  <insert id="insert" parameterType="net.iretailer.rest.model.OpeningTimeTmp">
+    insert into opening_time_tmp (fk_site_id, date, start_time, 
+      end_time, display_name)
+    values (#{fkSiteId,jdbcType=SMALLINT}, #{date,jdbcType=DATE}, #{startTime,jdbcType=TIME}, 
+      #{endTime,jdbcType=TIME}, #{displayName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="net.iretailer.rest.model.OpeningTimeTmp">
+    insert into opening_time_tmp
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="fkSiteId != null">
+        fk_site_id,
+      </if>
+      <if test="date != null">
+        date,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="displayName != null">
+        display_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="fkSiteId != null">
+        #{fkSiteId,jdbcType=SMALLINT},
+      </if>
+      <if test="date != null">
+        #{date,jdbcType=DATE},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIME},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIME},
+      </if>
+      <if test="displayName != null">
+        #{displayName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.iretailer.rest.model.OpeningTimeTmp">
+    update opening_time_tmp
+    <set>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIME},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIME},
+      </if>
+      <if test="displayName != null">
+        display_name = #{displayName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where fk_site_id = #{fkSiteId,jdbcType=SMALLINT}
+      and date = #{date,jdbcType=DATE}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.iretailer.rest.model.OpeningTimeTmp">
+    update opening_time_tmp
+    set start_time = #{startTime,jdbcType=TIME},
+      end_time = #{endTime,jdbcType=TIME},
+      display_name = #{displayName,jdbcType=VARCHAR}
+    where fk_site_id = #{fkSiteId,jdbcType=SMALLINT}
+      and date = #{date,jdbcType=DATE}
+  </update>
+</mapper>

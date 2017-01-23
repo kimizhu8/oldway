@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.HomePageMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.HomePage">
+    <id column="id" jdbcType="SMALLINT" property="id" />
+    <result column="enter" jdbcType="INTEGER" property="enter" />
+    <result column="exit" jdbcType="INTEGER" property="exit" />
+    <result column="passby" jdbcType="INTEGER" property="passby" />
+    <result column="sales" jdbcType="DOUBLE" property="sales" />
+    <result column="goods" jdbcType="INTEGER" property="goods" />
+    <result column="trades" jdbcType="INTEGER" property="trades" />
+    <result column="acreage" jdbcType="INTEGER" property="acreage" />
+    <result column="employee_number" jdbcType="INTEGER" property="employeeNumber" />
+    <result column="f_time" jdbcType="VARCHAR" property="time" />
+    <result column="stay_time" jdbcType="DOUBLE" property="stayTime" />
+    <result column="display_name" jdbcType="VARCHAR" property="displayName" />
+  </resultMap>
+  <resultMap id="ZonetypeResultMap" type="net.iretailer.rest.model.HomePageByZonetype">
+    <id column="enter" jdbcType="INTEGER" property="countIn" />
+    <result column="exit" jdbcType="INTEGER" property="countOut" />
+    <result column="zone_type" jdbcType="VARCHAR" property="zoneType" />
+    <result column="zone_name" jdbcType="VARCHAR" property="zoneName" />
+    <result column="f_time" jdbcType="VARCHAR" property="time" />
+    <result column="passby" jdbcType="VARCHAR" property="passby" />
+    <result column="stay_time" jdbcType="DOUBLE" property="stayTime" />
+    <result column="acreage" jdbcType="INTEGER" property="acreage" />
+    <result column="employee_number" jdbcType="INTEGER" property="employeeNumber" />
+  </resultMap>
+  <resultMap id="tagResultMap" type="net.iretailer.rest.model.HomePageByTag">
+    <id column="enter" jdbcType="INTEGER" property="countIn" />
+    <result column="exit" jdbcType="INTEGER" property="countOut" />
+    <result column="tag_value" jdbcType="VARCHAR" property="tagValue" />
+    <result column="passby" jdbcType="VARCHAR" property="passby" />
+    <result column="stay_time" jdbcType="DOUBLE" property="stayTime" />
+    <result column="sales" jdbcType="DOUBLE" property="sales" />
+    <result column="goods" jdbcType="INTEGER" property="goods" />
+    <result column="trades" jdbcType="INTEGER" property="trades" />
+    <result column="acreage" jdbcType="INTEGER" property="acreage" />
+    <result column="employee_number" jdbcType="INTEGER" property="employeeNumber" />
+    <result column="f_time" jdbcType="VARCHAR" property="time" />
+  </resultMap>
+  <resultMap id="locationResultMap" type="net.iretailer.rest.model.HomePageByLocation">
+    <id column="enter" jdbcType="INTEGER" property="countIn" />
+    <result column="exit" jdbcType="INTEGER" property="countOut" />
+    <result column="passby" jdbcType="INTEGER" property="passby" />
+    <result column="location_name" jdbcType="VARCHAR" property="locationName" />
+    <result column="stay_time" jdbcType="DOUBLE" property="stayTime" />
+    <result column="sales" jdbcType="DOUBLE" property="sales" />
+    <result column="goods" jdbcType="INTEGER" property="goods" />
+    <result column="trades" jdbcType="INTEGER" property="trades" />
+    <result column="acreage" jdbcType="INTEGER" property="acreage" />
+    <result column="employee_number" jdbcType="INTEGER" property="employeeNumber" />
+    <result column="f_time" jdbcType="VARCHAR" property="time" />
+    <result column="stay_time" jdbcType="DOUBLE" property="stayTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_device_id, _name, type, disabled, display_name, description, coordinate
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    update device_zone
+    set fk_device_id = #{fkDeviceId,jdbcType=SMALLINT},
+      _name = #{name,jdbcType=VARCHAR},
+      type = #{type,jdbcType=TINYINT},
+      disabled = #{disabled,jdbcType=BIT},
+      display_name = #{displayName,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      coordinate = #{coordinate,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <select id="getHomePage" resultMap="BaseResultMap">
+  	CALL HomePage(#{findchild,jdbcType=BIT},#{siteid,jdbcType=INTEGER},#{starttime,jdbcType=VARCHAR},#{endtime,jdbcType=VARCHAR},#{type,jdbcType=VARCHAR},#{total,jdbcType=VARCHAR})
+  </select>
+  <select id="getHomePageByZonetype" resultMap="ZonetypeResultMap">
+    CALL HomePageBySitezonetype(#{findchild,jdbcType=BIT},#{siteid,jdbcType=INTEGER},#{starttime,jdbcType=VARCHAR},#{endtime,jdbcType=VARCHAR},#{type,jdbcType=VARCHAR},#{zoneType,jdbcType=INTEGER})
+  </select>
+  <select id="getTotalData" resultMap="BaseResultMap">
+  	CALL HomePage(#{findchild,jdbcType=BIT},#{siteid,jdbcType=INTEGER},#{starttime,jdbcType=VARCHAR},#{endtime,jdbcType=VARCHAR},#{type,jdbcType=VARCHAR},#{total,jdbcType=VARCHAR})
+  </select>
+  <select id="getHomePageByTag" resultMap="tagResultMap">
+    CALL HomePageBySiteTag(#{findchild,jdbcType=BIT},#{siteid,jdbcType=INTEGER},#{starttime,jdbcType=VARCHAR},#{endtime,jdbcType=VARCHAR},#{type,jdbcType=VARCHAR},#{tagType,jdbcType=VARCHAR})
+  </select>
+  <select id="getHomePageByLocation" resultMap="locationResultMap">
+    CALL HomePageByLocation(#{findchild,jdbcType=BIT},#{siteid,jdbcType=INTEGER},#{starttime,jdbcType=VARCHAR},#{endtime,jdbcType=VARCHAR},#{type,jdbcType=VARCHAR},#{locationType,jdbcType=INTEGER})
+  </select>
+  <select id="getTotalCompareData" resultMap="BaseResultMap">
+  	CALL TotalCompareData(#{findchild,jdbcType=BIT},#{siteid,jdbcType=INTEGER},#{starttime,jdbcType=VARCHAR},#{endtime,jdbcType=VARCHAR})
+  </select>
+  <select id="getTotalCompareDataSitezone" resultMap="ZonetypeResultMap">
+    CALL TotalSitezoneData(#{findchild,jdbcType=BIT},#{siteid,jdbcType=INTEGER},#{starttime,jdbcType=VARCHAR},#{endtime,jdbcType=VARCHAR},#{zoneType,jdbcType=INTEGER})
+  </select>
+  <select id="getCollectSitezoneData" parameterType="java.util.Map" resultType="java.util.Map">
+	SELECT
+	CASE #{type,jdbcType=VARCHAR} 
+	WHEN '5' THEN VM._5   
+	WHEN '10' THEN VM._10
+	WHEN '15' THEN VM._15
+	WHEN '30' THEN VM._30
+	WHEN 'dh' THEN VM._dh
+	WHEN 'd' THEN VM.date
+	WHEN 'w' THEN VM._w
+	WHEN 'm' THEN VM._m
+	WHEN 'q' THEN VM._q
+	WHEN 'y' THEN VM._y
+	END 
+	as f_time,
+	SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_in WHEN 1 THEN records_pf_inout.count_out END) as enter,
+	SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_out WHEN 1 then records_pf_inout.count_in END) as `exit`,
+	SUM(CONVERT(records_pf_inout.count_out * TIME_TO_SEC(VM.time), DECIMAL) - CONVERT(records_pf_inout.count_in * TIME_TO_SEC(VM.time), DECIMAL))/SUM(records_pf_inout.count_in) as stay_time,
+	SUM(records_pf_passby.count_passby) as passby
+	FROM
+		VM
+	LEFT JOIN records_pf_inout ON records_pf_inout.fk_records_id = VM.id
+	LEFT JOIN records_pf_passby on records_pf_passby.fk_records_id=VM.id
+	LEFT JOIN records_sales	ON records_sales.fk_records_id=VM.id
+	WHERE
+		VM.site_id=#{siteid,jdbcType=INTEGER}
+	AND VM.date_time>=#{starttime,jdbcType=VARCHAR} AND VM.date_time &lt; #{endtime,jdbcType=VARCHAR}
+	AND VM.site_zone_type=#{zoneType,jdbcType=INTEGER}
+	AND VM.site_zone_id in     
+	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    	#{name,jdbcType=INTEGER}
+    </foreach>
+	GROUP BY f_time ORDER BY f_time;
+  </select>
+  <select id="getCollectData" parameterType="java.util.Map" resultType="java.util.Map">
+	SELECT
+	CASE #{type,jdbcType=VARCHAR} 
+	WHEN '5' THEN VM._5   
+	WHEN '10' THEN VM._10
+	WHEN '15' THEN VM._15
+	WHEN '30' THEN VM._30
+	WHEN 'dh' THEN VM._dh
+	WHEN 'd' THEN VM.date
+	WHEN 'w' THEN VM._w
+	WHEN 'm' THEN VM._m
+	WHEN 'q' THEN VM._q
+	WHEN 'y' THEN VM._y
+	END 
+	as f_time,
+	SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_in WHEN 1 THEN records_pf_inout.count_out END) as enter,
+	SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_out WHEN 1 then records_pf_inout.count_in END) as `exit`,
+	SUM(records_pf_passby.count_passby) as passby,
+  	SUM(records_sales.count_sales) as sales,
+	SUM(records_sales.count_goods) as goods, 
+	SUM(records_sales.count_trades) as trades, 
+	SUM(CONVERT(records_pf_inout.count_out * TIME_TO_SEC(VM.time), DECIMAL) - CONVERT(records_pf_inout.count_in * TIME_TO_SEC(VM.time), DECIMAL))/SUM(records_pf_inout.count_in) as stay_time,
+	MAX(VM.acreage) as acreage,
+	MAX(VM.employee_number) as employee_number
+	FROM
+		VM
+	LEFT JOIN records_pf_inout ON records_pf_inout.fk_records_id = VM.id
+	LEFT JOIN records_pf_passby on records_pf_passby.fk_records_id=VM.id
+	LEFT JOIN records_sales	ON records_sales.fk_records_id=VM.id
+	WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 1 THEN VM.site_id=#{siteid,jdbcType=INTEGER} ELSE VM.site_parent_id=#{siteid,jdbcType=INTEGER} END
+	AND VM.date_time>=#{starttime,jdbcType=VARCHAR} AND VM.date_time &lt; #{endtime,jdbcType=VARCHAR}
+	AND VM.site_zone_type in (0,7)
+	<if test="findSite == null">
+		AND VM.site_id in
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+    </if>
+	GROUP BY f_time ORDER BY f_time;
+  </select>
+  <select id="getCollectLocationData" parameterType="java.util.Map" resultType="java.util.Map">
+	SELECT
+	CASE #{type,jdbcType=VARCHAR} 
+	WHEN '5' THEN VM._5   
+	WHEN '10' THEN VM._10
+	WHEN '15' THEN VM._15
+	WHEN '30' THEN VM._30
+	WHEN 'dh' THEN VM._dh
+	WHEN 'd' THEN VM.date
+	WHEN 'w' THEN VM._w
+	WHEN 'm' THEN VM._m
+	WHEN 'q' THEN VM._q
+	WHEN 'y' THEN VM._y
+	END 
+	as f_time,
+	SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_in WHEN 1 THEN records_pf_inout.count_out END) as enter,
+	SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_out WHEN 1 then records_pf_inout.count_in END) as `exit`,
+	SUM(CONVERT(records_pf_inout.count_out * TIME_TO_SEC(VM.time), DECIMAL) - CONVERT(records_pf_inout.count_in * TIME_TO_SEC(VM.time), DECIMAL))/SUM(records_pf_inout.count_in) as stay_time,
+	SUM(records_pf_passby.count_passby) as passby,
+  	SUM(records_sales.count_sales) as sales,
+	SUM(records_sales.count_goods) as goods, 
+	SUM(records_sales.count_trades) as trades, 
+	SUM(CONVERT(records_pf_inout.count_out * TIME_TO_SEC(VM.time), DECIMAL) - CONVERT(records_pf_inout.count_in * TIME_TO_SEC(VM.time), DECIMAL))/SUM(records_pf_inout.count_in) as stay_time,
+	MAX(VM.acreage) as acreage,
+	MAX(VM.employee_number) as employee_number
+	FROM
+		VM
+	LEFT JOIN records_pf_inout ON records_pf_inout.fk_records_id = VM.id
+	LEFT JOIN records_pf_passby on records_pf_passby.fk_records_id=VM.id
+	LEFT JOIN records_sales	ON records_sales.fk_records_id=VM.id
+	WHERE
+		VM.site_parent_id=#{siteid,jdbcType=INTEGER}
+	AND VM.date_time>=#{starttime,jdbcType=VARCHAR} AND VM.date_time &lt; #{endtime,jdbcType=VARCHAR}
+	AND VM.site_zone_type in (0,7)	
+	AND 
+	(
+		CASE #{locationType,jdbcType=INTEGER} 
+		WHEN 0 then VM.quare_id
+		WHEN 1 then VM.province_id
+		WHEN 2 then VM.city_id
+		WHEN 3 then VM.county_id
+		END
+	) in     
+	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    	#{name}
+    </foreach>
+	GROUP BY f_time ORDER BY f_time;
+  </select>
+  
+  <select id="getCollectTagData" parameterType="java.util.Map" resultType="java.util.Map">
+	SELECT
+	CASE #{type,jdbcType=VARCHAR} 
+	WHEN '5' THEN VM._5   
+	WHEN '10' THEN VM._10
+	WHEN '15' THEN VM._15
+	WHEN '30' THEN VM._30
+	WHEN 'dh' THEN VM._dh
+	WHEN 'd' THEN VM.date
+	WHEN 'w' THEN VM._w
+	WHEN 'm' THEN VM._m
+	WHEN 'q' THEN VM._q
+	WHEN 'y' THEN VM._y
+	END 
+	as f_time,
+	SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_in WHEN 1 THEN records_pf_inout.count_out END) as enter,
+	SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_out WHEN 1 then records_pf_inout.count_in END) as `exit`,
+	SUM(records_pf_passby.count_passby) as passby,
+  	SUM(records_sales.count_sales) as sales, -- 销售额
+	SUM(records_sales.count_goods) as goods, -- 件数
+	SUM(records_sales.count_trades) as trades, -- 交易笔数
+	SUM(CONVERT(records_pf_inout.count_out * TIME_TO_SEC(VM.time), DECIMAL) - CONVERT(records_pf_inout.count_in * TIME_TO_SEC(VM.time), DECIMAL))/SUM(records_pf_inout.count_in) as stay_time,
+	MAX(VM.acreage) as acreage,
+	MAX(VM.employee_number) as employee_number
+	FROM
+		VM
+	LEFT JOIN site_tag ON site_tag.fk_site_id=VM.site_id	
+	LEFT JOIN records_pf_inout ON records_pf_inout.fk_records_id = VM.id
+	LEFT JOIN records_pf_passby on records_pf_passby.fk_records_id=VM.id
+	LEFT JOIN records_sales	ON records_sales.fk_records_id=VM.id
+	WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 1 THEN VM.site_id=#{siteid,jdbcType=INTEGER} ELSE VM.site_parent_id=#{siteid,jdbcType=INTEGER} END
+	AND VM.date_time>=#{starttime,jdbcType=VARCHAR} AND VM.date_time &lt; #{endtime,jdbcType=VARCHAR}
+	AND VM.site_zone_type in (0,7)
+	<if test="findSite == null">
+		AND site_tag._value in
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+    </if>
+	GROUP BY f_time ORDER BY f_time;
+  </select>
+  <select id="getCollectDataNoTime" parameterType="java.util.Map" resultType="java.util.Map">
+  	select
+	IFNULL(SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_in WHEN 1 THEN records_pf_inout.count_out END),0) as enter,
+	IFNULL(SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_out WHEN 1 THEN records_pf_inout.count_in END),0) as `exit`,
+	IFNULL(SUM(records_pf_passby.count_passby),0) as passby,
+    IFNULL(SUM(records_sales.count_sales),0) as sales, 
+  	IFNULL(SUM(records_sales.count_goods),0) as goods, 
+    IFNULL(SUM(records_sales.count_trades),0) as trades, 
+    IFNULL(SUM(CONVERT(records_pf_inout.count_out * TIME_TO_SEC(VM.time), DECIMAL) - CONVERT(records_pf_inout.count_in * TIME_TO_SEC(VM.time), DECIMAL))/SUM(records_pf_inout.count_in),0) as stay_time,
+	MAX(VM.acreage) as acreage,
+	MAX(VM.employee_number) as employee_number,
+	case #{total,jdbcType=VARCHAR} WHEN 'f' THEN VM.site_display_name ELSE 'total' END as display_name
+	FROM
+		VM
+	LEFT JOIN records_pf_inout ON records_pf_inout.fk_records_id = VM.id
+	LEFT JOIN records_pf_passby on records_pf_passby.fk_records_id=VM.id
+	LEFT JOIN records_sales	ON records_sales.fk_records_id=VM.id
+	WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 0 THEN VM.site_id = #{siteId,jdbcType=INTEGER} WHEN 1 THEN VM.site_parent_id=#{siteId,jdbcType=INTEGER} END
+	AND VM.date_time>=#{startTime,jdbcType=VARCHAR} AND VM.date_time &lt; #{endTime,jdbcType=VARCHAR}
+	AND VM.site_zone_type in (0,7)
+	<if test="names!=null">
+		AND VM.site_id in 
+		<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+			#{name}
+		</foreach>
+	</if>
+	GROUP BY display_name
+  </select>
+  <select id="getSitezoneDataNoTime" parameterType="java.util.Map" resultType="java.util.Map">
+  	select
+	IFNULL(SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_in WHEN 1 THEN records_pf_inout.count_out END),0) as enter,
+	IFNULL(SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_out WHEN 1 THEN records_pf_inout.count_in END),0) as `exit`,
+	IFNULL(SUM(records_pf_passby.count_passby),0) as passby,
+    IFNULL(SUM(records_sales.count_sales),0) as sales, 
+  	IFNULL(SUM(records_sales.count_goods),0) as goods, 
+    IFNULL(SUM(records_sales.count_trades),0) as trades, 
+    IFNULL(SUM(CONVERT(records_pf_inout.count_out * TIME_TO_SEC(VM.time), DECIMAL) - CONVERT(records_pf_inout.count_in * TIME_TO_SEC(VM.time), DECIMAL))/SUM(records_pf_inout.count_in),0) as stay_time,
+	MAX(VM.acreage) as acreage,
+	MAX(VM.employee_number) as employee_number,
+	case #{total,jdbcType=VARCHAR} WHEN 'f' THEN VM.site_zone_display_name ELSE 'total' END as zone_name
+	FROM
+		VM
+	LEFT JOIN records_pf_inout ON records_pf_inout.fk_records_id = VM.id
+	LEFT JOIN records_pf_passby on records_pf_passby.fk_records_id=VM.id
+	LEFT JOIN records_sales	ON records_sales.fk_records_id=VM.id
+	WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 0 THEN VM.site_id = #{siteId,jdbcType=INTEGER} WHEN 1 THEN VM.site_parent_id=#{siteId,jdbcType=INTEGER} END
+	AND VM.date_time>=#{startTime,jdbcType=VARCHAR} AND VM.date_time &lt; #{endTime,jdbcType=VARCHAR}
+	AND VM.site_zone_type=#{zoneType,jdbcType=INTEGER}
+	<if test="names!=null">
+		AND VM.site_zone_id in 
+		<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+			#{name}
+		</foreach>
+	</if>
+	GROUP BY zone_name
+  </select>
+  <select id="getTagDataNoTime" parameterType="java.util.Map" resultType="java.util.Map">
+	SELECT
+	IFNULL(SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_in WHEN 1 THEN records_pf_inout.count_out END),0) as enter,
+	IFNULL(SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_out WHEN 1 THEN records_pf_inout.count_in END),0) as `exit`,
+	IFNULL(SUM(records_pf_passby.count_passby),0) as passby,
+    IFNULL(SUM(records_sales.count_sales),0) as sales, 
+  	IFNULL(SUM(records_sales.count_goods),0) as goods, 
+    IFNULL(SUM(records_sales.count_trades),0) as trades, 
+	MAX(VM.acreage) as acreage,
+	MAX(VM.employee_number) as employee_number,
+	IFNULL(SUM(CONVERT(records_pf_inout.count_out * TIME_TO_SEC(VM.time), DECIMAL) - CONVERT(records_pf_inout.count_in * TIME_TO_SEC(VM.time), DECIMAL))/SUM(records_pf_inout.count_in),0) as stay_time,
+	case #{total,jdbcType=VARCHAR} WHEN 'f' THEN site_tag._value ELSE 'total' END as display_name
+	FROM
+		VM
+	LEFT JOIN site_tag ON site_tag.fk_site_id=VM.site_id
+	LEFT JOIN records_pf_inout ON records_pf_inout.fk_records_id = VM.id
+	LEFT JOIN records_pf_passby on records_pf_passby.fk_records_id=VM.id
+	LEFT JOIN records_sales	ON records_sales.fk_records_id=VM.id
+	WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 0 THEN VM.site_id = #{siteId,jdbcType=INTEGER} WHEN 1 THEN VM.site_parent_id=#{siteId,jdbcType=INTEGER} END	
+	AND VM.date_time>=#{startTime,jdbcType=VARCHAR} AND VM.date_time &lt; #{endTime,jdbcType=VARCHAR}
+	AND site_tag.type=#{tagType,jdbcType=VARCHAR}
+	AND VM.site_zone_type in (0,7)
+	<if test="names!=null">
+		AND site_tag._value in 
+		<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+			#{name}
+		</foreach>
+	</if>
+	GROUP BY display_name
+  </select>
+  <select id="getLocationNoTime" parameterType="java.util.Map" resultType="java.util.Map">
+  	SELECT
+	IFNULL(SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_in WHEN 1 THEN records_pf_inout.count_out END),0) as enter,
+	IFNULL(SUM(CASE reversed WHEN 0 THEN records_pf_inout.count_out WHEN 1 THEN records_pf_inout.count_in END),0) as `exit`,
+	IFNULL(SUM(records_pf_passby.count_passby),0) as passby,
+    IFNULL(SUM(records_sales.count_sales),0) as sales, 
+  	IFNULL(SUM(records_sales.count_goods),0) as goods, 
+    IFNULL(SUM(records_sales.count_trades),0) as trades, 
+ 	 	MAX(VM.acreage) as acreage,
+ 	 	MAX(VM.employee_number) as employee_number,
+ 	 	IFNULL(SUM(CONVERT(records_pf_inout.count_out * TIME_TO_SEC(VM.time), DECIMAL) - CONVERT(records_pf_inout.count_in * TIME_TO_SEC(VM.time), DECIMAL))/SUM(records_pf_inout.count_in),0) as stay_time,
+ 	 	case #{total,jdbcType=VARCHAR} WHEN 'f' THEN
+		IFNULL(CASE #{locationType,jdbcType=VARCHAR}
+				WHEN 0 THEN VM.quare_name
+			  	WHEN 1 THEN VM.province_name
+				WHEN 2 THEN VM.city_name
+				WHEN 3 THEN VM.county_name
+				END,'未分类')
+			ELSE 'total' END
+			as display_name
+		FROM
+			VM
+		LEFT JOIN records_pf_inout ON records_pf_inout.fk_records_id = VM.id
+		LEFT JOIN records_pf_passby on records_pf_passby.fk_records_id=VM.id
+		LEFT JOIN records_sales	ON records_sales.fk_records_id=VM.id
+		WHERE
+			CASE #{findSite,jdbcType=INTEGER} WHEN 0 THEN VM.site_id = #{siteId,jdbcType=INTEGER} WHEN 1 THEN VM.site_parent_id=#{siteId,jdbcType=INTEGER} END
+		AND VM.date_time>=#{startTime,jdbcType=VARCHAR} AND VM.date_time &lt; #{endTime,jdbcType=VARCHAR}
+		AND VM.site_zone_type in (0,7)
+		<if test="names!=null">
+		AND 
+		(
+			CASE #{locationType,jdbcType=INTEGER} 
+			WHEN 0 then VM.quare_id
+			WHEN 1 then VM.province_id
+			WHEN 2 then VM.city_id
+			WHEN 3 then VM.county_id
+			END
+		) in
+			<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+				#{name}
+			</foreach>
+		</if>
+		GROUP BY display_name
+  </select>
+  <select id="getWeather" parameterType="java.util.Map" resultType="java.util.Map">
+	select * from weather inner join site on weather.fk_location_id = site.fk_location_id where site.id=#{siteId,jdbcType=INTEGER} and weather.date = #{date,jdbcType=VARCHAR}
+  </select>
+  <select id="getSubject" parameterType="java.util.Map" resultType="java.util.Map">
+	select * from `subject` where site_id = #{siteId,jdbcType=INTEGER} and start_time &lt;= #{date,jdbcType=VARCHAR} and end_time >= #{date,jdbcType=VARCHAR};
+  </select>
+  <select id="getHoliday" parameterType="java.util.Map" resultType="java.util.Map">
+	select * from `holiday` where start_date &lt;= #{date,jdbcType=VARCHAR} and end_date >= #{date,jdbcType=VARCHAR};
+  </select>
+  <select id="getPeriodSubjectAndHoliday" parameterType="java.util.Map" resultType="java.util.Map">
+	select name from subject inner join site on subject.site_id=site.id where NOT(end_time &lt; #{startTime,jdbcType=VARCHAR} or start_time > #{endTime,jdbcType=VARCHAR})
+	and case #{findSite,jdbcType=VARCHAR} WHEN 0 THEN site_id = #{siteId,jdbcType=VARCHAR} WHEN 1 THEN parent_id = #{siteId,jdbcType=VARCHAR} END
+	union ALL
+	select name from holiday where NOT(end_date &lt; #{startTime,jdbcType=VARCHAR} or start_date > #{endTime,jdbcType=VARCHAR});
+  </select>
+  
+</mapper>

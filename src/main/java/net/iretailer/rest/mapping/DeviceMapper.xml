@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.DeviceMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.Device">
+    <id column="id" jdbcType="SMALLINT" property="id" />
+    <result column="fk_site_id" jdbcType="SMALLINT" property="fkSiteId" />
+    <result column="_name" jdbcType="VARCHAR" property="name" />
+    <result column="disabled" jdbcType="BIT" property="disabled" />
+    <result column="display_name" jdbcType="VARCHAR" property="displayName" />
+    <result column="last_update" jdbcType="TIMESTAMP" property="lastUpdate" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="coordinate" jdbcType="VARCHAR" property="coordinate" />
+    <result column="mac_address" jdbcType="VARCHAR" property="macAddress" />
+    <result column="ip_address" jdbcType="VARCHAR" property="ipAddress" />
+    <result column="http_port" jdbcType="VARCHAR" property="httpPort" />
+    <result column="https_port" jdbcType="VARCHAR" property="httpsPort" />
+    <result column="hostname" jdbcType="VARCHAR" property="hostname" />
+    <result column="hw_platform" jdbcType="VARCHAR" property="hwPlatform" />
+    <result column="timezone" jdbcType="VARCHAR" property="timezone" />
+    <result column="dst" jdbcType="VARCHAR" property="dst" />
+    <result column="device_type" jdbcType="VARCHAR" property="deviceType" />
+    <result column="serial_number" jdbcType="VARCHAR" property="serialNumber" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_site_id, _name, disabled, display_name, last_update, description, coordinate, 
+    mac_address, ip_address, http_port, https_port, hostname, hw_platform, timezone, 
+    dst, device_type, serial_number
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Short" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from device
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Short">
+    delete from device
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="net.iretailer.rest.model.Device">
+    insert into device (id, fk_site_id, _name, 
+      disabled, display_name, last_update, 
+      description, coordinate, mac_address, 
+      ip_address, http_port, https_port, 
+      hostname, hw_platform, timezone, 
+      dst, device_type, serial_number
+      )
+    values (#{id,jdbcType=SMALLINT}, #{fkSiteId,jdbcType=SMALLINT}, #{name,jdbcType=VARCHAR}, 
+      #{disabled,jdbcType=BIT}, #{displayName,jdbcType=VARCHAR}, #{lastUpdate,jdbcType=TIMESTAMP}, 
+      #{description,jdbcType=VARCHAR}, #{coordinate,jdbcType=VARCHAR}, #{macAddress,jdbcType=VARCHAR}, 
+      #{ipAddress,jdbcType=VARCHAR}, #{httpPort,jdbcType=VARCHAR}, #{httpsPort,jdbcType=VARCHAR}, 
+      #{hostname,jdbcType=VARCHAR}, #{hwPlatform,jdbcType=VARCHAR}, #{timezone,jdbcType=VARCHAR}, 
+      #{dst,jdbcType=VARCHAR}, #{deviceType,jdbcType=VARCHAR}, #{serialNumber,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="net.iretailer.rest.model.Device">
+    insert into device
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkSiteId != null">
+        fk_site_id,
+      </if>
+      <if test="name != null">
+        _name,
+      </if>
+      <if test="disabled != null">
+        disabled,
+      </if>
+      <if test="displayName != null">
+        display_name,
+      </if>
+      <if test="lastUpdate != null">
+        last_update,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="coordinate != null">
+        coordinate,
+      </if>
+      <if test="macAddress != null">
+        mac_address,
+      </if>
+      <if test="ipAddress != null">
+        ip_address,
+      </if>
+      <if test="httpPort != null">
+        http_port,
+      </if>
+      <if test="httpsPort != null">
+        https_port,
+      </if>
+      <if test="hostname != null">
+        hostname,
+      </if>
+      <if test="hwPlatform != null">
+        hw_platform,
+      </if>
+      <if test="timezone != null">
+        timezone,
+      </if>
+      <if test="dst != null">
+        dst,
+      </if>
+      <if test="deviceType != null">
+        device_type,
+      </if>
+      <if test="serialNumber != null">
+        serial_number,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=SMALLINT},
+      </if>
+      <if test="fkSiteId != null">
+        #{fkSiteId,jdbcType=SMALLINT},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="disabled != null">
+        #{disabled,jdbcType=BIT},
+      </if>
+      <if test="displayName != null">
+        #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="lastUpdate != null">
+        #{lastUpdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="coordinate != null">
+        #{coordinate,jdbcType=VARCHAR},
+      </if>
+      <if test="macAddress != null">
+        #{macAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="ipAddress != null">
+        #{ipAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="httpPort != null">
+        #{httpPort,jdbcType=VARCHAR},
+      </if>
+      <if test="httpsPort != null">
+        #{httpsPort,jdbcType=VARCHAR},
+      </if>
+      <if test="hostname != null">
+        #{hostname,jdbcType=VARCHAR},
+      </if>
+      <if test="hwPlatform != null">
+        #{hwPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="timezone != null">
+        #{timezone,jdbcType=VARCHAR},
+      </if>
+      <if test="dst != null">
+        #{dst,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceType != null">
+        #{deviceType,jdbcType=VARCHAR},
+      </if>
+      <if test="serialNumber != null">
+        #{serialNumber,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.iretailer.rest.model.Device">
+    update device
+    <set>
+      <if test="fkSiteId != null">
+        fk_site_id = #{fkSiteId,jdbcType=SMALLINT},
+      </if>
+      <if test="name != null">
+        _name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="disabled != null">
+        disabled = #{disabled,jdbcType=BIT},
+      </if>
+      <if test="displayName != null">
+        display_name = #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="lastUpdate != null">
+        last_update = #{lastUpdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="coordinate != null">
+        coordinate = #{coordinate,jdbcType=VARCHAR},
+      </if>
+      <if test="macAddress != null">
+        mac_address = #{macAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="ipAddress != null">
+        ip_address = #{ipAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="httpPort != null">
+        http_port = #{httpPort,jdbcType=VARCHAR},
+      </if>
+      <if test="httpsPort != null">
+        https_port = #{httpsPort,jdbcType=VARCHAR},
+      </if>
+      <if test="hostname != null">
+        hostname = #{hostname,jdbcType=VARCHAR},
+      </if>
+      <if test="hwPlatform != null">
+        hw_platform = #{hwPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="timezone != null">
+        timezone = #{timezone,jdbcType=VARCHAR},
+      </if>
+      <if test="dst != null">
+        dst = #{dst,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceType != null">
+        device_type = #{deviceType,jdbcType=VARCHAR},
+      </if>
+      <if test="serialNumber != null">
+        serial_number = #{serialNumber,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.iretailer.rest.model.Device">
+    update device
+    set fk_site_id = #{fkSiteId,jdbcType=SMALLINT},
+      _name = #{name,jdbcType=VARCHAR},
+      disabled = #{disabled,jdbcType=BIT},
+      display_name = #{displayName,jdbcType=VARCHAR},
+      last_update = #{lastUpdate,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=VARCHAR},
+      coordinate = #{coordinate,jdbcType=VARCHAR},
+      mac_address = #{macAddress,jdbcType=VARCHAR},
+      ip_address = #{ipAddress,jdbcType=VARCHAR},
+      http_port = #{httpPort,jdbcType=VARCHAR},
+      https_port = #{httpsPort,jdbcType=VARCHAR},
+      hostname = #{hostname,jdbcType=VARCHAR},
+      hw_platform = #{hwPlatform,jdbcType=VARCHAR},
+      timezone = #{timezone,jdbcType=VARCHAR},
+      dst = #{dst,jdbcType=VARCHAR},
+      device_type = #{deviceType,jdbcType=VARCHAR},
+      serial_number = #{serialNumber,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <select id="getDeviceBySiteId" parameterType="java.lang.Short" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from device
+    where fk_site_id = #{siteId,jdbcType=SMALLINT}
+  </select>
+  <select id="getAllDevice" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from device
+  </select>
+  <delete id="deleteDeviceList">
+    delete from device
+    where id in
+    <foreach collection="array" item="id" index="index" open="(" close=")" separator=",">
+    	#{id}
+    </foreach>
+  </delete>
+</mapper>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.OperationLogMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.OperationLog">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="admin" jdbcType="VARCHAR" property="admin" />
+    <result column="ip" jdbcType="VARCHAR" property="ip" />
+    <result column="function" jdbcType="VARCHAR" property="function" />
+    <result column="targetMapper" jdbcType="VARCHAR" property="targetmapper" />
+    <result column="result" jdbcType="VARCHAR" property="result" />
+    <result column="info" jdbcType="VARCHAR" property="info" />
+    <result column="time" jdbcType="VARCHAR" property="time" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, admin, ip, function, targetMapper, result, info, time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from operation_log
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from operation_log
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="net.iretailer.rest.model.OperationLog">
+    insert into operation_log (id, admin, ip, 
+      function, targetMapper, result, 
+      info, time)
+    values (#{id,jdbcType=INTEGER}, #{admin,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, 
+      #{function,jdbcType=VARCHAR}, #{targetmapper,jdbcType=VARCHAR}, #{result,jdbcType=VARCHAR}, 
+      #{info,jdbcType=VARCHAR}, #{time,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="net.iretailer.rest.model.OperationLog">
+    insert into operation_log
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="admin != null">
+        admin,
+      </if>
+      <if test="ip != null">
+        ip,
+      </if>
+      <if test="function != null">
+        function,
+      </if>
+      <if test="targetmapper != null">
+        targetMapper,
+      </if>
+      <if test="result != null">
+        result,
+      </if>
+      <if test="info != null">
+        info,
+      </if>
+      <if test="time != null">
+        time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="admin != null">
+        #{admin,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null">
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="function != null">
+        #{function,jdbcType=VARCHAR},
+      </if>
+      <if test="targetmapper != null">
+        #{targetmapper,jdbcType=VARCHAR},
+      </if>
+      <if test="result != null">
+        #{result,jdbcType=VARCHAR},
+      </if>
+      <if test="info != null">
+        #{info,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.iretailer.rest.model.OperationLog">
+    update operation_log
+    <set>
+      <if test="admin != null">
+        admin = #{admin,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null">
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="function != null">
+        function = #{function,jdbcType=VARCHAR},
+      </if>
+      <if test="targetmapper != null">
+        targetMapper = #{targetmapper,jdbcType=VARCHAR},
+      </if>
+      <if test="result != null">
+        result = #{result,jdbcType=VARCHAR},
+      </if>
+      <if test="info != null">
+        info = #{info,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        time = #{time,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.iretailer.rest.model.OperationLog">
+    update operation_log
+    set admin = #{admin,jdbcType=VARCHAR},
+      ip = #{ip,jdbcType=VARCHAR},
+      function = #{function,jdbcType=VARCHAR},
+      targetMapper = #{targetmapper,jdbcType=VARCHAR},
+      result = #{result,jdbcType=VARCHAR},
+      info = #{info,jdbcType=VARCHAR},
+      time = #{time,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <select id="getAllLog" resultMap="BaseResultMap">
+    select 
+		*
+    from operation_log
+  </select>
+</mapper>

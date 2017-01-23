@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.SiteTagMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.SiteTag">
+    <id column="id" jdbcType="SMALLINT" property="id" />
+    <result column="fk_site_id" jdbcType="SMALLINT" property="fkSiteId" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="_value" jdbcType="VARCHAR" property="value" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_site_id, type, _value
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Short" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from site_tag
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Short">
+    delete from site_tag
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="net.iretailer.rest.model.SiteTag">
+    insert into site_tag (id, fk_site_id, type, 
+      _value)
+    values (#{id,jdbcType=SMALLINT}, #{fkSiteId,jdbcType=SMALLINT}, #{type,jdbcType=VARCHAR}, 
+      #{value,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="net.iretailer.rest.model.SiteTag">
+    insert into site_tag
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkSiteId != null">
+        fk_site_id,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="value != null">
+        _value,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=SMALLINT},
+      </if>
+      <if test="fkSiteId != null">
+        #{fkSiteId,jdbcType=SMALLINT},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null">
+        #{value,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.iretailer.rest.model.SiteTag">
+    update site_tag
+    <set>
+      <if test="fkSiteId != null">
+        fk_site_id = #{fkSiteId,jdbcType=SMALLINT},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null">
+        _value = #{value,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.iretailer.rest.model.SiteTag">
+    update site_tag
+    set fk_site_id = #{fkSiteId,jdbcType=SMALLINT},
+      type = #{type,jdbcType=VARCHAR},
+      _value = #{value,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <select id="selectBySiteId" parameterType="java.lang.Short" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from site_tag
+    where fk_site_id = #{id,jdbcType=SMALLINT}
+  </select>
+  <select id="selectAllTagType" resultType="java.lang.String" >
+  	select distinct(site_tag.type) from site_tag inner join site on site_tag.fk_site_id=site.id where site.parent_id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectTagValue" resultType="java.util.Map" parameterType="java.util.Map">
+  	select distinct(_value) as displayName,_value as id from site_tag inner join site on site_tag.fk_site_id = site.id where site_tag.type = #{tagType,jdbcType=VARCHAR} and site.parent_id = #{siteId,jdbcType=INTEGER}
+  </select>
+</mapper>

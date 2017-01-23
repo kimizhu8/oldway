@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.SiteMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.Site">
+    <id column="id" jdbcType="SMALLINT" property="id" />
+    <result column="fk_location_id" jdbcType="SMALLINT" property="fkLocationId" />
+    <result column="parent_id" jdbcType="SMALLINT" property="parentId" />
+    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="rank" jdbcType="SMALLINT" property="rank" />
+    <result column="disabled" jdbcType="BIT" property="disabled" />
+    <result column="_name" jdbcType="VARCHAR" property="name" />
+    <result column="display_name" jdbcType="VARCHAR" property="displayName" />
+    <result column="operation_acreage" jdbcType="INTEGER" property="operationAcreage" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="coordinate" jdbcType="VARCHAR" property="coordinate" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_location_id, parent_id, type, rank, disabled, _name, display_name, operation_acreage, 
+    description, coordinate, address
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Short" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from site
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <select id="selectSitesByParentId" parameterType="java.lang.Short" resultMap="BaseResultMap">
+  	select * from site where parent_id=#{parentId,jdbcType=SMALLINT} or id=#{parentId,jdbcType=SMALLINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Short">
+    delete from site
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="net.iretailer.rest.model.Site">
+    insert into site (id, fk_location_id, parent_id, 
+      type, rank, disabled, 
+      _name, display_name, operation_acreage, 
+      description, coordinate, address
+      )
+    values (#{id,jdbcType=SMALLINT}, #{fkLocationId,jdbcType=SMALLINT}, #{parentId,jdbcType=SMALLINT}, 
+      #{type,jdbcType=TINYINT}, #{rank,jdbcType=SMALLINT}, #{disabled,jdbcType=BIT}, 
+      #{name,jdbcType=VARCHAR}, #{displayName,jdbcType=VARCHAR}, #{operationAcreage,jdbcType=INTEGER}, 
+      #{description,jdbcType=VARCHAR}, #{coordinate,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="net.iretailer.rest.model.Site">
+    insert into site
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkLocationId != null">
+        fk_location_id,
+      </if>
+      <if test="parentId != null">
+        parent_id,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="rank != null">
+        rank,
+      </if>
+      <if test="disabled != null">
+        disabled,
+      </if>
+      <if test="name != null">
+        _name,
+      </if>
+      <if test="displayName != null">
+        display_name,
+      </if>
+      <if test="operationAcreage != null">
+        operation_acreage,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="coordinate != null">
+        coordinate,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=SMALLINT},
+      </if>
+      <if test="fkLocationId != null">
+        #{fkLocationId,jdbcType=SMALLINT},
+      </if>
+      <if test="parentId != null">
+        #{parentId,jdbcType=SMALLINT},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=TINYINT},
+      </if>
+      <if test="rank != null">
+        #{rank,jdbcType=SMALLINT},
+      </if>
+      <if test="disabled != null">
+        #{disabled,jdbcType=BIT},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="displayName != null">
+        #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationAcreage != null">
+        #{operationAcreage,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="coordinate != null">
+        #{coordinate,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.iretailer.rest.model.Site">
+    update site
+    <set>
+      <if test="fkLocationId != null">
+        fk_location_id = #{fkLocationId,jdbcType=SMALLINT},
+      </if>
+      <if test="parentId != null">
+        parent_id = #{parentId,jdbcType=SMALLINT},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=TINYINT},
+      </if>
+      <if test="rank != null">
+        rank = #{rank,jdbcType=SMALLINT},
+      </if>
+      <if test="disabled != null">
+        disabled = #{disabled,jdbcType=BIT},
+      </if>
+      <if test="name != null">
+        _name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="displayName != null">
+        display_name = #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationAcreage != null">
+        operation_acreage = #{operationAcreage,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="coordinate != null">
+        coordinate = #{coordinate,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.iretailer.rest.model.Site">
+    update site
+    set fk_location_id = #{fkLocationId,jdbcType=SMALLINT},
+      parent_id = #{parentId,jdbcType=SMALLINT},
+      type = #{type,jdbcType=TINYINT},
+      rank = #{rank,jdbcType=SMALLINT},
+      disabled = #{disabled,jdbcType=BIT},
+      _name = #{name,jdbcType=VARCHAR},
+      display_name = #{displayName,jdbcType=VARCHAR},
+      operation_acreage = #{operationAcreage,jdbcType=INTEGER},
+      description = #{description,jdbcType=VARCHAR},
+      coordinate = #{coordinate,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from site
+  </select>
+  <delete id="deleteSites">
+    delete from site
+    where id in
+        <foreach collection="array" item="siteIds" index="index"
+            open="(" close=")" separator=",">
+            #{siteIds}
+        </foreach>
+  </delete>
+  <select id="selectParentSite" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from site where type = 1 or type = 2
+  </select>
+  <select id="selectAllSiteName" parameterType="java.util.Map" resultType="java.util.Map" >
+  	select distinct(display_name) as displayName,id as id from site WHERE CASE #{findSite,jdbcType=INTEGER} WHEN 0 THEN id=#{siteId,jdbcType=INTEGER} ELSE parent_id=#{siteId,jdbcType=INTEGER} END
+  </select>
+  <select id="selectSiteInfo" parameterType="java.util.Map" resultType="java.util.Map" >
+  	select distinct(display_name) as displayName,id as id from site where id=#{siteId,jdbcType=INTEGER}
+  </select>
+</mapper>

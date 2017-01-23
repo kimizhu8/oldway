@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.RoleMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.Role">
+    <id column="role_id" jdbcType="INTEGER" property="roleId" />
+    <result column="operation_type" jdbcType="INTEGER" property="operationType" />
+    <result column="menu" jdbcType="VARCHAR" property="menu" />
+    <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+    <result column="home_settings" jdbcType="VARCHAR" property="homeSettings" />
+    <result column="icon_address" jdbcType="VARCHAR" property="iconAddress" />
+    <result column="logo_address" jdbcType="VARCHAR" property="logoAddress" />
+    <result column="background_address" jdbcType="VARCHAR" property="backgroundAddress" />
+    <result column="bottom_text" jdbcType="VARCHAR" property="bottomText" />
+    <result column="role_site" jdbcType="VARCHAR" property="roleSite"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    role_id, operation_type, menu, role_name, home_settings, icon_address, logo_address, 
+    background_address, bottom_text,role_site
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from role
+    where role_id = #{roleId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from role
+    where role_id = #{roleId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="net.iretailer.rest.model.Role">
+    insert into role (role_id, operation_type, menu, 
+      role_name, home_settings, icon_address, 
+      logo_address, background_address, bottom_text,role_site
+      )
+    values (#{roleId,jdbcType=INTEGER}, #{operationType,jdbcType=INTEGER}, #{menu,jdbcType=VARCHAR}, 
+      #{roleName,jdbcType=VARCHAR}, #{homeSettings,jdbcType=VARCHAR}, #{iconAddress,jdbcType=VARCHAR}, 
+      #{logoAddress,jdbcType=VARCHAR}, #{backgroundAddress,jdbcType=VARCHAR}, #{bottomText,jdbcType=VARCHAR},#{roleSite,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="net.iretailer.rest.model.Role">
+    insert into role
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="roleId != null">
+        role_id,
+      </if>
+      <if test="operationType != null">
+        operation_type,
+      </if>
+      <if test="menu != null">
+        menu,
+      </if>
+      <if test="roleName != null">
+        role_name,
+      </if>
+      <if test="homeSettings != null">
+        home_settings,
+      </if>
+      <if test="iconAddress != null">
+        icon_address,
+      </if>
+      <if test="logoAddress != null">
+        logo_address,
+      </if>
+      <if test="backgroundAddress != null">
+        background_address,
+      </if>
+      <if test="bottomText != null">
+        bottom_text,
+      </if>
+      <if test="roleSite != null">
+        role_site
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="roleId != null">
+        #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="operationType != null">
+        #{operationType,jdbcType=INTEGER},
+      </if>
+      <if test="menu != null">
+        #{menu,jdbcType=VARCHAR},
+      </if>
+      <if test="roleName != null">
+        #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="homeSettings != null">
+        #{homeSettings,jdbcType=VARCHAR},
+      </if>
+      <if test="iconAddress != null">
+        #{iconAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="logoAddress != null">
+        #{logoAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="backgroundAddress != null">
+        #{backgroundAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="bottomText != null">
+        #{bottomText,jdbcType=VARCHAR},
+      </if>
+      <if test="roleSite != null">
+        #{roleSite,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.iretailer.rest.model.Role">
+    update role
+    <set>
+      <if test="operationType != null">
+        operation_type = #{operationType,jdbcType=INTEGER},
+      </if>
+      <if test="menu != null">
+        menu = #{menu,jdbcType=VARCHAR},
+      </if>
+      <if test="roleName != null">
+        role_name = #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="homeSettings != null">
+        home_settings = #{homeSettings,jdbcType=VARCHAR},
+      </if>
+      <if test="iconAddress != null">
+        icon_address = #{iconAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="logoAddress != null">
+        logo_address = #{logoAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="backgroundAddress != null">
+        background_address = #{backgroundAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="bottomText != null">
+        bottom_text = #{bottomText,jdbcType=VARCHAR},
+      </if>
+      <if test="roleSite != null">
+        role_site = #{roleSite,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where role_id = #{roleId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.iretailer.rest.model.Role">
+    update role
+    set operation_type = #{operationType,jdbcType=INTEGER},
+      menu = #{menu,jdbcType=VARCHAR},
+      role_name = #{roleName,jdbcType=VARCHAR},
+      home_settings = #{homeSettings,jdbcType=VARCHAR},
+      icon_address = #{iconAddress,jdbcType=VARCHAR},
+      logo_address = #{logoAddress,jdbcType=VARCHAR},
+      background_address = #{backgroundAddress,jdbcType=VARCHAR},
+      bottom_text = #{bottomText,jdbcType=VARCHAR},
+      role_site = #{roleSite,jdbcType=VARCHAR}
+    where role_id = #{roleId,jdbcType=INTEGER}
+  </update>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from role
+  </select>
+  <select id="selectByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from role where role_id = #{id,jdbcType=INTEGER}
+  </select>
+</mapper>

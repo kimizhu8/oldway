@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.EmployeeNumberMapper">
+  <select id="selectAllEmployeeNum" parameterType="java.util.Map" resultType="java.util.Map">
+	select * from employee_number where fk_site_id = #{siteId,jdbcType=INTEGER}
+  </select>
+  
+  <insert id="insertEmployeeNumber" parameterType="java.util.Map" >
+	insert into employee_number (fk_site_id,date,number,description) values (#{siteId,jdbcType=INTEGER},#{date,jdbcType=VARCHAR},#{number,jdbcType=INTEGER},#{desc,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateEmployeeNumber" parameterType="java.util.Map" >
+	update employee_number set 
+		fk_site_id=#{siteId,jdbcType=INTEGER},
+		date=#{date,jdbcType=VARCHAR},
+		number=#{number,jdbcType=INTEGER},
+		description=#{desc,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="deleteEmployeeNumber" parameterType="java.util.Map" >
+	delete from employee_number where id = #{id,jdbcType=INTEGER}
+  </insert>
+</mapper>

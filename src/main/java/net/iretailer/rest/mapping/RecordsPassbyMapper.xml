@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.RecordsPassbyMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.RecordsPassby">
+    <id column="fk_records_id" jdbcType="INTEGER" property="fkRecordsId" />
+    <result column="count_passby" jdbcType="SMALLINT" property="countPassby" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    fk_records_id, count_passby
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from records_pf_passby
+    where fk_records_id = #{fkRecordsId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from records_pf_passby
+    where fk_records_id = #{fkRecordsId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="net.iretailer.rest.model.RecordsPassby">
+    insert into records_pf_passby (fk_records_id, count_passby)
+    values (#{fkRecordsId,jdbcType=INTEGER}, #{countPassby,jdbcType=SMALLINT})
+  </insert>
+  <insert id="insertSelective" parameterType="net.iretailer.rest.model.RecordsPassby">
+    insert into records_pf_passby
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="fkRecordsId != null">
+        fk_records_id,
+      </if>
+      <if test="countPassby != null">
+        count_passby,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="fkRecordsId != null">
+        #{fkRecordsId,jdbcType=INTEGER},
+      </if>
+      <if test="countPassby != null">
+        #{countPassby,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.iretailer.rest.model.RecordsPassby">
+    update records_pf_passby
+    <set>
+      <if test="countPassby != null">
+        count_passby = #{countPassby,jdbcType=SMALLINT},
+      </if>
+    </set>
+    where fk_records_id = #{fkRecordsId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.iretailer.rest.model.RecordsPassby">
+    update records_pf_passby
+    set count_passby = #{countPassby,jdbcType=SMALLINT}
+    where fk_records_id = #{fkRecordsId,jdbcType=INTEGER}
+  </update>
+</mapper>

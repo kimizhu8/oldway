@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.OpeningTimeMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.OpeningTime">
+    <id column="id" jdbcType="SMALLINT" property="id" />
+    <result column="fk_site_id" jdbcType="SMALLINT" property="fkSiteId" />
+    <result column="display_name" jdbcType="VARCHAR" property="displayName" />
+    <result column="start_date" jdbcType="DATE" property="startDate" />
+    <result column="end_date" jdbcType="DATE" property="endDate" />
+    <result column="start_time" jdbcType="TIME" property="startTime" />
+    <result column="end_time" jdbcType="TIME" property="endTime" />
+    <result column="weekday" jdbcType="TINYINT" property="weekday" />
+    <result column="priority" jdbcType="TINYINT" property="priority" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_site_id, display_name, start_date, end_date, start_time, end_time, weekday, 
+    priority
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Short" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from opening_time
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Short">
+    delete from opening_time
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="net.iretailer.rest.model.OpeningTime">
+    insert into opening_time (id, fk_site_id, display_name, 
+      start_date, end_date, start_time, 
+      end_time, weekday, priority
+      )
+    values (#{id,jdbcType=SMALLINT}, #{fkSiteId,jdbcType=SMALLINT}, #{displayName,jdbcType=VARCHAR}, 
+      #{startDate,jdbcType=DATE}, #{endDate,jdbcType=DATE}, #{startTime,jdbcType=TIME}, 
+      #{endTime,jdbcType=TIME}, #{weekday,jdbcType=TINYINT}, #{priority,jdbcType=TINYINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="net.iretailer.rest.model.OpeningTime">
+    insert into opening_time
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkSiteId != null">
+        fk_site_id,
+      </if>
+      <if test="displayName != null">
+        display_name,
+      </if>
+      <if test="startDate != null">
+        start_date,
+      </if>
+      <if test="endDate != null">
+        end_date,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="weekday != null">
+        weekday,
+      </if>
+      <if test="priority != null">
+        priority,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=SMALLINT},
+      </if>
+      <if test="fkSiteId != null">
+        #{fkSiteId,jdbcType=SMALLINT},
+      </if>
+      <if test="displayName != null">
+        #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="startDate != null">
+        #{startDate,jdbcType=DATE},
+      </if>
+      <if test="endDate != null">
+        #{endDate,jdbcType=DATE},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIME},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIME},
+      </if>
+      <if test="weekday != null">
+        #{weekday,jdbcType=TINYINT},
+      </if>
+      <if test="priority != null">
+        #{priority,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.iretailer.rest.model.OpeningTime">
+    update opening_time
+    <set>
+      <if test="fkSiteId != null">
+        fk_site_id = #{fkSiteId,jdbcType=SMALLINT},
+      </if>
+      <if test="displayName != null">
+        display_name = #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="startDate != null">
+        start_date = #{startDate,jdbcType=DATE},
+      </if>
+      <if test="endDate != null">
+        end_date = #{endDate,jdbcType=DATE},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIME},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIME},
+      </if>
+      <if test="weekday != null">
+        weekday = #{weekday,jdbcType=TINYINT},
+      </if>
+      <if test="priority != null">
+        priority = #{priority,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.iretailer.rest.model.OpeningTime">
+    update opening_time
+    set fk_site_id = #{fkSiteId,jdbcType=SMALLINT},
+      display_name = #{displayName,jdbcType=VARCHAR},
+      start_date = #{startDate,jdbcType=DATE},
+      end_date = #{endDate,jdbcType=DATE},
+      start_time = #{startTime,jdbcType=TIME},
+      end_time = #{endTime,jdbcType=TIME},
+      weekday = #{weekday,jdbcType=TINYINT},
+      priority = #{priority,jdbcType=TINYINT}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select 
+	*
+	from opening_time where fk_site_id = #{siteId,jdbcType=VARCHAR}
+  </select>
+</mapper>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.RecordsInoutMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.RecordsInout">
+    <id column="fk_records_id" jdbcType="INTEGER" property="fkRecordsId" />
+    <result column="count_in" jdbcType="SMALLINT" property="countIn" />
+    <result column="count_out" jdbcType="SMALLINT" property="countOut" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    fk_records_id, count_in, count_out
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from records_pf_inout
+    where fk_records_id = #{fkRecordsId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from records_pf_inout
+    where fk_records_id = #{fkRecordsId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="net.iretailer.rest.model.RecordsInout">
+    insert into records_pf_inout (fk_records_id, count_in, count_out
+      )
+    values (#{fkRecordsId,jdbcType=INTEGER}, #{countIn,jdbcType=SMALLINT}, #{countOut,jdbcType=SMALLINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="net.iretailer.rest.model.RecordsInout">
+    insert into records_pf_inout
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="fkRecordsId != null">
+        fk_records_id,
+      </if>
+      <if test="countIn != null">
+        count_in,
+      </if>
+      <if test="countOut != null">
+        count_out,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="fkRecordsId != null">
+        #{fkRecordsId,jdbcType=INTEGER},
+      </if>
+      <if test="countIn != null">
+        #{countIn,jdbcType=SMALLINT},
+      </if>
+      <if test="countOut != null">
+        #{countOut,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.iretailer.rest.model.RecordsInout">
+    update records_pf_inout
+    <set>
+      <if test="countIn != null">
+        count_in = #{countIn,jdbcType=SMALLINT},
+      </if>
+      <if test="countOut != null">
+        count_out = #{countOut,jdbcType=SMALLINT},
+      </if>
+    </set>
+    where fk_records_id = #{fkRecordsId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.iretailer.rest.model.RecordsInout">
+    update records_pf_inout
+    set count_in = #{countIn,jdbcType=SMALLINT},
+      count_out = #{countOut,jdbcType=SMALLINT}
+    where fk_records_id = #{fkRecordsId,jdbcType=INTEGER}
+  </update>
+</mapper>

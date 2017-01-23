@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.HolidayMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.Holiday">
+    <id column="id" jdbcType="SMALLINT" property="id" />
+    <result column="start_date" jdbcType="DATE" property="startDate" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="working_day" jdbcType="VARCHAR" property="workingDay" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="end_date" jdbcType="DATE" property="endDate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, start_date, name, working_day, type, description, end_date
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Short" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from holiday
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Short">
+    delete from holiday
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="net.iretailer.rest.model.Holiday">
+    insert into holiday (id, start_date, name, 
+      working_day, type, description, 
+      end_date)
+    values (#{id,jdbcType=SMALLINT}, #{startDate,jdbcType=DATE}, #{name,jdbcType=VARCHAR}, 
+      #{workingDay,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{endDate,jdbcType=DATE})
+  </insert>
+  <insert id="insertSelective" parameterType="net.iretailer.rest.model.Holiday">
+    insert into holiday
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="startDate != null">
+        start_date,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="workingDay != null">
+        working_day,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="endDate != null">
+        end_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=SMALLINT},
+      </if>
+      <if test="startDate != null">
+        #{startDate,jdbcType=DATE},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="workingDay != null">
+        #{workingDay,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="endDate != null">
+        #{endDate,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.iretailer.rest.model.Holiday">
+    update holiday
+    <set>
+      <if test="startDate != null">
+        start_date = #{startDate,jdbcType=DATE},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="workingDay != null">
+        working_day = #{workingDay,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="endDate != null">
+        end_date = #{endDate,jdbcType=DATE},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.iretailer.rest.model.Holiday">
+    update holiday
+    set start_date = #{startDate,jdbcType=DATE},
+      name = #{name,jdbcType=VARCHAR},
+      working_day = #{workingDay,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      end_date = #{endDate,jdbcType=DATE}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select 
+		*
+    from holiday
+  </select>
+</mapper>

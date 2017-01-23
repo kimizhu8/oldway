@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.DeviceZoneMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.DeviceZone">
+    <id column="id" jdbcType="SMALLINT" property="id" />
+    <result column="fk_device_id" jdbcType="SMALLINT" property="fkDeviceId" />
+    <result column="_name" jdbcType="VARCHAR" property="name" />
+    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="disabled" jdbcType="BIT" property="disabled" />
+    <result column="display_name" jdbcType="VARCHAR" property="displayName" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="coordinate" jdbcType="VARCHAR" property="coordinate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_device_id, _name, type, disabled, display_name, description, coordinate
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Short" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from device_zone
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Short">
+    delete from device_zone
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="net.iretailer.rest.model.DeviceZone">
+    insert into device_zone (id, fk_device_id, _name, 
+      type, disabled, display_name, 
+      description, coordinate)
+    values (#{id,jdbcType=SMALLINT}, #{fkDeviceId,jdbcType=SMALLINT}, #{name,jdbcType=VARCHAR}, 
+      #{type,jdbcType=TINYINT}, #{disabled,jdbcType=BIT}, #{displayName,jdbcType=VARCHAR}, 
+      #{description,jdbcType=VARCHAR}, #{coordinate,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="net.iretailer.rest.model.DeviceZone">
+    insert into device_zone
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkDeviceId != null">
+        fk_device_id,
+      </if>
+      <if test="name != null">
+        _name,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="disabled != null">
+        disabled,
+      </if>
+      <if test="displayName != null">
+        display_name,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="coordinate != null">
+        coordinate,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=SMALLINT},
+      </if>
+      <if test="fkDeviceId != null">
+        #{fkDeviceId,jdbcType=SMALLINT},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=TINYINT},
+      </if>
+      <if test="disabled != null">
+        #{disabled,jdbcType=BIT},
+      </if>
+      <if test="displayName != null">
+        #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="coordinate != null">
+        #{coordinate,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.iretailer.rest.model.DeviceZone">
+    update device_zone
+    <set>
+      <if test="fkDeviceId != null">
+        fk_device_id = #{fkDeviceId,jdbcType=SMALLINT},
+      </if>
+      <if test="name != null">
+        _name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=TINYINT},
+      </if>
+      <if test="disabled != null">
+        disabled = #{disabled,jdbcType=BIT},
+      </if>
+      <if test="displayName != null">
+        display_name = #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="coordinate != null">
+        coordinate = #{coordinate,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.iretailer.rest.model.DeviceZone">
+    update device_zone
+    set fk_device_id = #{fkDeviceId,jdbcType=SMALLINT},
+      _name = #{name,jdbcType=VARCHAR},
+      type = #{type,jdbcType=TINYINT},
+      disabled = #{disabled,jdbcType=BIT},
+      display_name = #{displayName,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      coordinate = #{coordinate,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <select id="getDeviceZoneBySiteId" parameterType="java.lang.Short" resultMap="BaseResultMap">
+  SELECT
+		device_zone.id AS id,
+		device_zone.fk_device_id AS fkDeviceId,
+		device_zone._name AS NAME,
+		device_zone.type AS type,
+		device_zone.disabled AS disabled,
+		device_zone.display_name AS displayName,
+		device_zone.description AS description,
+		device.display_name as deviceName
+	FROM
+		device_zone 
+	INNER JOIN r_sitezone_devicezone on r_sitezone_devicezone.fk_device_zone_id=device_zone.id
+	INNER JOIN site_zone on site_zone.id=r_sitezone_devicezone.fk_site_zone_id
+	INNER JOIN site on site.id=site_zone.fk_site_id
+	INNER JOIN device on device.id=device_zone.fk_device_id
+	WHERE
+	site.id=#{siteId,jdbcType=SMALLINT}
+	and device_zone.type=21
+  </select>
+  <select id="getDeviceZoneBySiteIdTemp" parameterType="java.lang.Short" resultMap="BaseResultMap">
+  SELECT
+		device_zone.id AS id,
+		device_zone.fk_device_id AS fkDeviceId,
+		device_zone._name AS NAME,
+		device_zone.type AS type,
+		device_zone.disabled AS disabled,
+		device_zone.display_name AS displayName,
+		device_zone.description AS description,
+		device.display_name as deviceName
+	FROM
+		device_zone 
+	INNER JOIN device on device.id=device_zone.fk_device_id
+	WHERE
+	device.fk_site_id=#{siteId,jdbcType=SMALLINT}
+  </select>
+  <select id="getDevicezoneCount" parameterType="java.lang.Short" resultType="java.lang.Integer">
+	select count(*) from device_zone where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <select id="getDevicezoneByDeviceId" parameterType="java.lang.Short" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from device_zone
+    where fk_device_id = #{deviceId,jdbcType=SMALLINT}
+  </select>
+  <delete id="deleteDevicezones" parameterType="java.lang.Short">
+    delete from device_zone
+    where id in 
+        <foreach collection="array" item="ids" index="index"
+            open="(" close=")" separator=",">
+            #{ids}
+        </foreach>
+  </delete>
+</mapper>
