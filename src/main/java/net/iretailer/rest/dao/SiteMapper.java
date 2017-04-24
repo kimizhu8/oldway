@@ -27,7 +27,7 @@ public interface SiteMapper {
     
     ArrayList<Site> selectParentSite();
     
-    ArrayList<Map<String,Object>> selectAllSiteName(HashMap<String,Integer> map);
+    ArrayList<Map<String,Object>> selectAllSiteName(HashMap<String,Object> map);
     
     ArrayList<Map<String,Object>> selectSiteInfo(HashMap<String,Integer> map);
 }

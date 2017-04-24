@@ -52,6 +52,7 @@ public class ReportDataController {
 		private static final long serialVersionUID = 1L;
 
 		{
+			put(0,"q");
 			put(1,"m");
 			put(2,"w");
 			put(3,"d");
@@ -69,6 +70,7 @@ public class ReportDataController {
 		private static final long serialVersionUID = 1L;
 
 		{
+			put(0,new SimpleDateFormat("yyyy-MM"));
 			put(1,new SimpleDateFormat("yyyy-MM"));
 			put(2,new SimpleDateFormat("yyyy-MM-dd"));
 			put(3,new SimpleDateFormat("MM-dd"));
@@ -107,57 +109,6 @@ public class ReportDataController {
     			return ReturnMapUtil.packData(result);
     		}
     	}
-    	
-//    	if (cateId ==102) {
-//			ArrayList<HomePage> list = homePageService.getTotalCompareData(false, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)));
-//			Map<String,Object> result = new HashMap<String,Object>();
-//    		ArrayList<String> categories = new ArrayList<String>();
-//    		categories.add("进入流");
-//    		categories.add("出入流");
-//			result.put("categories", categories);
-//			ArrayList<ArrayList<Map<String,Object>>> dataList = new ArrayList<ArrayList<Map<String,Object>>>();
-//			Map<String,Object> dataIn = new HashMap<String,Object>();
-//			
-//			dataIn.put("name","汇总");
-//			ArrayList<Integer> tempList = new ArrayList<Integer>();
-//			tempList.add(list.get(0).getEnter());
-//			tempList.add(list.get(0).getExit());
-//			
-//			dataIn.put("data", tempList.clone());
-//			ArrayList<Map<String,Object>> dataInList = new ArrayList<Map<String,Object>>();
-//			dataInList.add(dataIn);
-//			dataList.add(dataInList);
-//			result.put("data", dataList);
-//			return ReturnMapUtil.packData(result);
-//    	}
-//    	
-//    	if (cateId ==103) {
-//    		ArrayList<HomePageByZonetype> list = homePageService.getTotalSitezoneData(false, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), filterId-2);
-//		//	ArrayList<HomePage> list = homePageService.getTotalCompareData(false, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)));
-//			Map<String,Object> result = new HashMap<String,Object>();
-//    		ArrayList<String> categories = new ArrayList<String>();
-//    		for (int i=0;i<list.size();i++){
-//    			categories.add(list.get(i).getZoneName());
-//    		}
-//			result.put("categories", categories);
-//
-//			ArrayList<ArrayList<Map<String,Object>>> dataList = new ArrayList<ArrayList<Map<String,Object>>>();
-//
-//			//单个数据
-//			ArrayList<Map<String,Object>> dataInList = new ArrayList<Map<String,Object>>();
-//			for (int i=0;i<list.size();i++){
-//				Map<String,Object> dataIn = new HashMap<String,Object>();
-//				dataIn.put("name",list.get(i).getZoneName());
-//				ArrayList<Integer> tempDataList = new ArrayList<Integer>();
-//				tempDataList.add(list.get(i).getCountIn());
-//				dataIn.put("data", tempDataList.clone());
-//				dataInList.add(dataIn);
-//			}
-//			//单个数据
-//			dataList.add(dataInList);
-//			result.put("data", dataList);
-//			return ReturnMapUtil.packData(result);
-//    	}
     	if (cateId ==11 || cateId ==12 || cateId == 14 || cateId == 22){
     		if (cateId==11||cateId==12||cateId==14){
         		if (!roleService.blockRole(request,Integer.parseInt(site_name),cateId)) return ReturnMapUtil.packData("恶意登录");
@@ -170,10 +121,16 @@ public class ReportDataController {
     		if (filterId==0 || filterId == 1) {
     			Byte siteType = siteService.testSelect(Short.parseShort(site_name)).getType();
     			ArrayList<HomePage> list = new ArrayList<HomePage>();
+    			Integer[] blockSite = roleService.blockSite(request);
+        		String names = request.getParameter("total");
+        		String[] name = names.split(",");
     			if (filterId ==1){
-        			list = homePageService.getTotalData(false, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), scaleMap.get(scale),"f");
+        			list = homePageService.getTotalData(false, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), scaleMap.get(scale),"f",blockSite,name);
     			} else {
-        			list = homePageService.getTotalData(true, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), scaleMap.get(scale),"f");
+        			list = homePageService.getTotalData(true, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), scaleMap.get(scale),"f",blockSite,name);
+    			}
+    			if (list ==null) {
+    				return ReturnMapUtil.packError("2", "没数据");
     			}
     			int j=-1;
     			//添加category
@@ -461,9 +418,6 @@ public class ReportDataController {
     			resultMap.put("data", dataList);
 
     			//汇总数据
-    			
-        		String names = request.getParameter("total");
-        		String[] name = names.split(",");
 
         		Map<String,Object> result = new HashMap<String,Object>();
         		HashMap<String,Object> map = new HashMap<String,Object>();
@@ -477,7 +431,8 @@ public class ReportDataController {
     				name = new String[1];
     				name[0] = site_name;
             		map.put("names", name);
-    			}        		
+    			}
+    			map.put("blockSite", blockSite);
         		ArrayList<Map<String,Object>> data1sourcelist = homePageMapper.getCollectData(map);
         		HashMap<String,Object> noDataMap = new HashMap<String,Object>();
         		noDataMap.put("startTime", sdf.format(new Date(st)));
@@ -485,11 +440,16 @@ public class ReportDataController {
         		noDataMap.put("siteId",Integer.parseInt(site_name));
         		noDataMap.put("total", "t");
     			noDataMap.put("findSite", 1);
+    			noDataMap.put("names", name);
         		if (filterId == 1){
         			noDataMap.put("findSite", 0);
         		}
         		noDataMap.put("names", name);
+        		noDataMap.put("blockSite", blockSite);
         		ArrayList<Map<String,Object>> data2sourceList = homePageMapper.getCollectDataNoTime(noDataMap);
+        		if (data2sourceList.size()==0){
+    				return ReturnMapUtil.packError("2", "没数据");
+    			}
         		noDataMap.put("total", "f");
         		ArrayList<Map<String,Object>> data3sourceList = homePageMapper.getCollectDataNoTime(noDataMap);
         		Map<String,Map<String,Object>> data1sourceMap = new HashMap<String,Map<String,Object>>();
@@ -894,7 +854,7 @@ public class ReportDataController {
     					Map<String,Object> value = data1sourceMap.get(categories.get(i));
             			list1.add(value.get("enter"));
             			list2.add(value.get("exit"));
-            			if (value.get("enter")==null || value.get("passby")==null || value.get("passby").equals(0)){
+            			if (value.get("enter")==null || value.get("passby")==null || value.get("passby").toString().equals("0")){
             				list3.add(0.00);
             			} else {
                 			Double enter = Double.parseDouble(value.get("enter").toString());
@@ -928,42 +888,42 @@ public class ReportDataController {
     	    				list7.add(value.get("goods"));
     	    			}
     	    			//转化率
-    	    			if (value.get("trades")==null || value.get("enter")==null || ((BigDecimal)value.get("enter")).equals(0)){
+    	    			if (value.get("trades")==null || value.get("enter")==null || (value.get("enter").toString()).equals("0")){
     	    				list8.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal((Double.parseDouble(value.get("trades").toString())*100)/Double.parseDouble(value.get("enter").toString())).setScale(2,RoundingMode.UP);
     	    				list8.add(bg.doubleValue());
     	    			}
     	    			//客单价
-    	    			if (value.get("sales")==null || value.get("enter")==null ||  ((BigDecimal)value.get("enter")).equals(0)){
+    	    			if (value.get("sales")==null || value.get("enter")==null ||  (value.get("enter").toString()).equals("0")){
     	    				list9.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal((Double.parseDouble(value.get("sales").toString()))/Double.parseDouble(value.get("enter").toString())).setScale(2,RoundingMode.UP);
     	    				list9.add(bg.doubleValue());
     	    			}
     	    			//票单价
-    	    			if (value.get("sales")==null || value.get("trades")==null || ((BigDecimal)value.get("trades")).equals(0)){
+    	    			if (value.get("sales")==null || value.get("trades")==null || (value.get("trades").toString()).equals("0")){
     	    				list10.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal((Double.parseDouble(value.get("sales").toString()))/Double.parseDouble(value.get("trades").toString())).setScale(2,RoundingMode.UP);
     	    				list10.add(bg.doubleValue());
     	    			}
     	    			//票单量
-    	    			if (value.get("goods")==null || value.get("trades")==null || ((BigDecimal)value.get("trades")).equals(0)){
+    	    			if (value.get("goods")==null || value.get("trades")==null || (value.get("trades").toString()).equals("0")){
     	    				list11.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal((Double.parseDouble(value.get("goods").toString()))/Double.parseDouble(value.get("trades").toString())).setScale(2,RoundingMode.UP);
     	    				list11.add(bg.doubleValue());
     	    			}
     	    			//客单量
-    	    			if (value.get("goods")==null || value.get("enter")==null || ((BigDecimal)value.get("enter")).equals(0)){
+    	    			if (value.get("goods")==null || value.get("enter")==null || (value.get("enter").toString()).equals("0")){
     	    				list12.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal((Double.parseDouble(value.get("goods").toString()))/Double.parseDouble(value.get("enter").toString())).setScale(2,RoundingMode.UP);
     	    				list12.add(bg.doubleValue());
     	    			}
     	    			//件单价
-    	    			if (value.get("sales")==null || value.get("goods")==null || ((BigDecimal)value.get("goods")).equals(0)){
+    	    			if (value.get("sales")==null || value.get("goods")==null || (value.get("goods").toString()).equals("0")){
     	    				list13.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal((Double.parseDouble(value.get("sales").toString()))/Double.parseDouble(value.get("goods").toString())).setScale(2,RoundingMode.UP);
@@ -1044,7 +1004,20 @@ public class ReportDataController {
     		}
     		if (filterId==1){
     			Map<String,Object> resultMap = new HashMap<String,Object>();
-    			ArrayList<HomePage> list = homePageService.getTotalData(false, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), scaleMap.get(scale),"f");
+    			Integer[] blockSite = roleService.blockSite(request);
+    			//汇总数据
+        		String names = request.getParameter("total");
+        		String[] name = names.split(",");
+    			Byte siteType = siteService.testSelect(Short.parseShort(site_name)).getType();
+    			ArrayList<HomePage> list = null;
+    			if (siteType ==2){
+        			list = homePageService.getTotalData(true, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), scaleMap.get(scale),"f",blockSite,name);
+    			} else {
+        			list = homePageService.getTotalData(false, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), scaleMap.get(scale),"f",blockSite,name);
+    			}
+    			if (list ==null) {
+    				return ReturnMapUtil.packError("2", "没数据");
+    			}
     			//添加category
     			categoryMap.clear();
     			for (int i=0;i<list.size();i++){
@@ -1121,10 +1094,6 @@ public class ReportDataController {
     			}
     			resultMap.put("data", dataList);
 
-    			//汇总数据
-        		String names = request.getParameter("total");
-        		String[] name = names.split(",");
-
         		Map<String,Object> result = new HashMap<String,Object>();
         		HashMap<String,Object> map = new HashMap<String,Object>();
         		map.put("type",scaleMap.get(scale));
@@ -1191,7 +1160,15 @@ public class ReportDataController {
     		}
     		if (filterId==2 || filterId==3 || filterId==4 || filterId==5 || filterId==6){
     			Map<String,Object> resultMap = new HashMap<String,Object>();
-    			ArrayList<HomePageByZonetype> list = homePageService.getHomePagebyZonetype(false, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), scaleMap.get(scale),filterId-2);
+        		Integer[] blockSite = roleService.blockSite(request);
+        		
+        		String names = request.getParameter("total");
+        		String[] name = names.split(",");
+        		
+    			ArrayList<HomePageByZonetype> list = homePageService.getHomePagebyZonetype(false, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), scaleMap.get(scale),filterId-2,blockSite,name);
+    			if (list ==null) {
+    				return ReturnMapUtil.packError("2", "没数据");
+    			}
     			//添加category
     			categoryMap.clear();
     			for (int i=0;i<list.size();i++){
@@ -1247,7 +1224,7 @@ public class ReportDataController {
     	    				}
 
     	    				//入店率
-            				if (value.getPassby()==null){
+            				if (value.getPassby()==null || value.getPassby().toString().equals("0")){
             					passbyList.add(0.00);
             				} else {
             					BigDecimal bg = new BigDecimal(((double)value.getCountIn()*100)/value.getPassby()).setScale(2,RoundingMode.UP);
@@ -1295,9 +1272,6 @@ public class ReportDataController {
     			}
     			resultMap.put("data", dataList);
     			//汇总数据
-    			
-        		String names = request.getParameter("total");
-        		String[] name = names.split(",");
         		Map<String,Object> result = new HashMap<String,Object>();
         		HashMap<String,Object> map = new HashMap<String,Object>();
         		map.put("type",scaleMap.get(scale));
@@ -1306,6 +1280,8 @@ public class ReportDataController {
         		map.put("endtime", sdf.format(new Date(et)));
         		map.put("siteid", Integer.parseInt(site_name));
         		map.put("names", name);
+        		blockSite = roleService.blockSite(request);
+        		map.put("blockSite", blockSite);
         		ArrayList<Map<String,Object>> data1sourcelist = homePageMapper.getCollectSitezoneData(map);
         		HashMap<String,Object> noDataMap = new HashMap<String,Object>();
         		noDataMap.put("startTime", sdf.format(new Date(st)));
@@ -1315,7 +1291,11 @@ public class ReportDataController {
         		noDataMap.put("total", "t");
         		noDataMap.put("findSite", 0);
         		noDataMap.put("names", name);
+        		noDataMap.put("blockSite", blockSite);
         		ArrayList<Map<String,Object>> data2sourceList = homePageMapper.getSitezoneDataNoTime(noDataMap);
+        		if (data2sourceList.size()==0){
+    				return ReturnMapUtil.packError("2", "没数据");
+    			}
         		noDataMap.put("total", "f");
         		ArrayList<Map<String,Object>> data3sourceList = homePageMapper.getSitezoneDataNoTime(noDataMap);
         		Map<String,Map<String,Object>> data1sourceMap = new HashMap<String,Map<String,Object>>();
@@ -1507,7 +1487,15 @@ public class ReportDataController {
     		if (filterId==7){
     			Map<String,Object> resultMap = new HashMap<String,Object>();
     			String type = request.getParameter("tagType");
-    			ArrayList<HomePageByTag> list = homePageService.getHomePagebyTag(true, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), scaleMap.get(scale),type);
+    			Integer[] blockSite = roleService.blockSite(request);
+    			
+        		String names = request.getParameter("total");
+        		String[] name = names.split(",");
+        		
+    			ArrayList<HomePageByTag> list = homePageService.getHomePagebyTag(true, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), scaleMap.get(scale),type,blockSite,name);
+    			if (list ==null) {
+    				return ReturnMapUtil.packError("2", "没数据");
+    			}
     			//添加category
     			categoryMap.clear();
     			for (int i=0;i<list.size();i++){
@@ -1680,7 +1668,7 @@ public class ReportDataController {
         	    				jikeliList.add(bg.doubleValue());
         	    			}
         	    			//平效
-        	    			if (value.getSales()==null || value.getCountIn()==null || value.getCountIn()==0){
+        	    			if (value.getSales()==null || value.getAcreage()==null || value.getAcreage()==0){
         	    				pingxiaoList.add(0.0);
         	    			} else {
             					BigDecimal bg = new BigDecimal(((double)value.getSales())/value.getAcreage()).setScale(2,RoundingMode.UP);
@@ -1789,8 +1777,6 @@ public class ReportDataController {
     			}
     			resultMap.put("data", dataList);
     			//汇总数据
-        		String names = request.getParameter("total");
-        		String[] name = names.split(",");
 
         		Map<String,Object> result = new HashMap<String,Object>();
         		HashMap<String,Object> map = new HashMap<String,Object>();
@@ -1800,6 +1786,8 @@ public class ReportDataController {
         		map.put("siteid", Integer.parseInt(site_name));
         		map.put("tagType", type);
         		map.put("names", name);
+        		blockSite = roleService.blockSite(request);
+        		map.put("blockSite", blockSite);
         		ArrayList<Map<String,Object>> data1sourcelist = homePageMapper.getCollectTagData(map);
         		HashMap<String,Object> noDataMap = new HashMap<String,Object>();
         		noDataMap.put("startTime", sdf.format(new Date(st)));
@@ -1809,7 +1797,11 @@ public class ReportDataController {
         		noDataMap.put("total", "t");
         		noDataMap.put("findSite", 1);
         		noDataMap.put("names", name);
+        		noDataMap.put("blockSite", blockSite);
         		ArrayList<Map<String,Object>> data2sourceList = homePageMapper.getTagDataNoTime(noDataMap);
+        		if (data2sourceList.size()==0){
+        			return ReturnMapUtil.packError("2", "没数据");
+        		}
         		noDataMap.put("total", "f");
         		ArrayList<Map<String,Object>> data3sourceList = homePageMapper.getTagDataNoTime(noDataMap);
         		Map<String,Map<String,Object>> data1sourceMap = new HashMap<String,Map<String,Object>>();
@@ -2213,7 +2205,7 @@ public class ReportDataController {
     					Map<String,Object> value = data1sourceMap.get(categories.get(i));
             			list1.add(value.get("enter"));
             			list2.add(value.get("exit"));
-            			if (value.get("enter")==null || value.get("passby")==null || value.get("passby").equals(0)){
+            			if (value.get("enter")==null || value.get("passby")==null || value.get("passby").toString().equals("0")){
             				list3.add(0.00);
             			} else {
                 			Double enter = Double.parseDouble(value.get("enter").toString());
@@ -2247,63 +2239,63 @@ public class ReportDataController {
     	    				list7.add(value.get("goods"));
     	    			}
     	    			//转化率
-    	    			if (value.get("trades")==null || value.get("enter")==null || ((BigDecimal)value.get("enter")).equals(0)){
+    	    			if (value.get("trades")==null || value.get("enter")==null || value.get("enter").toString().equals("0")){
     	    				list8.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("trades").toString())/Double.parseDouble(value.get("enter").toString())*100).setScale(2,RoundingMode.UP);
     	    				list8.add(bg.doubleValue());
     	    			}
     	    			//客单价
-    	    			if (value.get("sales")==null || value.get("enter")==null ||  ((BigDecimal)value.get("enter")).equals(0)){
+    	    			if (value.get("sales")==null || value.get("enter")==null ||  value.get("enter").toString().equals("0")){
     	    				list9.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("sales").toString())/Double.parseDouble(value.get("enter").toString())).setScale(2,RoundingMode.UP);
     	    				list9.add(bg.doubleValue());
     	    			}
     	    			//票单价
-    	    			if (value.get("sales")==null || value.get("trades")==null || ((BigDecimal)value.get("trades")).equals(0)){
+    	    			if (value.get("sales")==null || value.get("trades")==null || value.get("trades").toString().equals("0")){
     	    				list10.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("sales").toString())/Double.parseDouble(value.get("trades").toString())).setScale(2,RoundingMode.UP);
     	    				list10.add(bg.doubleValue());
     	    			}
     	    			//票单量
-    	    			if (value.get("goods")==null || value.get("trades")==null || ((BigDecimal)value.get("trades")).equals(0)){
+    	    			if (value.get("goods")==null || value.get("trades")==null || value.get("trades").toString().equals("0")){
     	    				list11.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("goods").toString())/Double.parseDouble(value.get("trades").toString())).setScale(2,RoundingMode.UP);
     	    				list11.add(bg.doubleValue());
     	    			}
     	    			//客单量
-    	    			if (value.get("goods")==null || value.get("enter")==null || ((BigDecimal)value.get("enter")).equals(0)){
+    	    			if (value.get("goods")==null || value.get("enter")==null || value.get("enter").toString().equals("0")){
     	    				list12.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("goods").toString())/Double.parseDouble(value.get("enter").toString())).setScale(2,RoundingMode.UP);
     	    				list12.add(bg.doubleValue());
     	    			}
     	    			//件单价
-    	    			if (value.get("sales")==null || value.get("goods")==null || ((BigDecimal)value.get("goods")).equals(0)){
+    	    			if (value.get("sales")==null || value.get("goods")==null || value.get("goods").toString().equals("0")){
     	    				list13.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("sales").toString())/Double.parseDouble(value.get("goods").toString())).setScale(2,RoundingMode.UP);
     	    				list13.add(bg.doubleValue());
     	    			}
     	    			//集客力
-    	    			if (value.get("enter")==null || value.get("acreage")==null || value.get("acreage").equals(0)){
+    	    			if (value.get("enter")==null || value.get("acreage")==null || value.get("acreage").toString().equals("0")){
     	    				list14.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("enter").toString())/Double.parseDouble(value.get("acreage").toString())).setScale(2,RoundingMode.UP);
     	    				list14.add(bg.doubleValue());
     	    			}
     	    			//平效
-    	    			if (value.get("sales")==null || value.get("acreage")==null || value.get("acreage").equals(0)){
+    	    			if (value.get("sales")==null || value.get("acreage")==null || value.get("acreage").toString().equals("0")){
     	    				list15.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("sales").toString())/Double.parseDouble(value.get("acreage").toString())).setScale(2,RoundingMode.UP);
     	    				list15.add(bg.doubleValue());
     	    			}
     	    			//顾客员工比
-    	    			if (value.get("enter")==null || value.get("employee_number")==null || value.get("employee_number").equals(0)){
+    	    			if (value.get("enter")==null || value.get("employee_number")==null || value.get("employee_number").toString().equals("0")){
     	    				list16.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("enter").toString())/Double.parseDouble(value.get("employee_number").toString())).setScale(2,RoundingMode.UP);
@@ -2354,7 +2346,12 @@ public class ReportDataController {
     		}
     		if (filterId==8||filterId==9||filterId==10||filterId==11){
     			Map<String,Object> resultMap = new HashMap<String,Object>();
-    			ArrayList<HomePageByLocation> list = homePageService.getHomePageByLocation(true, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), scaleMap.get(scale),filterId-8);
+    			Integer[] blockSite = roleService.blockSite(request);
+        		
+    			String names = request.getParameter("total");
+        		String[] name = names.split(",");
+        		
+    			ArrayList<HomePageByLocation> list = homePageService.getHomePageByLocation(true, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), scaleMap.get(scale),filterId-8,blockSite,name);
     			//添加category
     			categoryMap.clear();
     			for (int i=0;i<list.size();i++){
@@ -2637,9 +2634,6 @@ public class ReportDataController {
     				dataList.add(dataYuangongbiList);
     			}
     			resultMap.put("data", dataList);
-    			//汇总数据
-        		String names = request.getParameter("total");
-        		String[] name = names.split(",");
 
         		Map<String,Object> result = new HashMap<String,Object>();
         		HashMap<String,Object> map = new HashMap<String,Object>();
@@ -2649,6 +2643,8 @@ public class ReportDataController {
         		map.put("endtime", sdf.format(new Date(et)));
         		map.put("siteid", Integer.parseInt(site_name));
         		map.put("names", name);
+        		blockSite = roleService.blockSite(request);
+        		map.put("blockSite", blockSite);
         		ArrayList<Map<String,Object>> data1sourcelist = homePageMapper.getCollectLocationData(map);
         		HashMap<String,Object> noDataMap = new HashMap<String,Object>();
         		noDataMap.put("startTime", sdf.format(new Date(st)));
@@ -2658,7 +2654,11 @@ public class ReportDataController {
         		noDataMap.put("total", "t");
         		noDataMap.put("findSite", 1);
         		noDataMap.put("names", name);
+        		noDataMap.put("blockSite", blockSite);
         		ArrayList<Map<String,Object>> data2sourceList = homePageMapper.getLocationNoTime(noDataMap);
+        		if (data2sourceList.size()==0){
+        			return ReturnMapUtil.packError("2", "没数据");
+        		}
         		noDataMap.put("total", "f");
         		ArrayList<Map<String,Object>> data3sourceList = homePageMapper.getLocationNoTime(noDataMap);
         		
@@ -3063,7 +3063,7 @@ public class ReportDataController {
     					Map<String,Object> value = data1sourceMap.get(categories.get(i));
             			list1.add(value.get("enter"));
             			list2.add(value.get("exit"));
-            			if (value.get("enter")==null || value.get("passby")==null || value.get("passby").equals(0)){
+            			if (value.get("enter")==null || value.get("passby")==null || value.get("passby").toString().equals("0")){
             				list3.add(0.00);
             			} else {
                 			Double enter = Double.parseDouble(value.get("enter").toString());
@@ -3097,42 +3097,42 @@ public class ReportDataController {
     	    				list7.add(value.get("goods"));
     	    			}
     	    			//转化率
-    	    			if (value.get("trades")==null || value.get("enter")==null || ((BigDecimal)value.get("enter")).equals(0)){
+    	    			if (value.get("trades")==null || value.get("enter")==null || value.get("enter").toString().equals("0")){
     	    				list8.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("trades").toString())/Double.parseDouble(value.get("enter").toString())*100).setScale(2,RoundingMode.UP);
     	    				list8.add(bg.doubleValue());
     	    			}
     	    			//客单价
-    	    			if (value.get("sales")==null || value.get("enter")==null ||  ((BigDecimal)value.get("enter")).equals(0)){
+    	    			if (value.get("sales")==null || value.get("enter")==null ||  value.get("enter").toString().equals("0")){
     	    				list9.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("sales").toString())/Double.parseDouble(value.get("enter").toString())).setScale(2,RoundingMode.UP);
     	    				list9.add(bg.doubleValue());
     	    			}
     	    			//票单价
-    	    			if (value.get("sales")==null || value.get("trades")==null || ((BigDecimal)value.get("trades")).equals(0)){
+    	    			if (value.get("sales")==null || value.get("trades")==null || value.get("trades").toString().equals("0")){
     	    				list10.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("sales").toString())/Double.parseDouble(value.get("trades").toString())).setScale(2,RoundingMode.UP);
     	    				list10.add(bg.doubleValue());
     	    			}
     	    			//票单量
-    	    			if (value.get("goods")==null || value.get("trades")==null || ((BigDecimal)value.get("trades")).equals(0)){
+    	    			if (value.get("goods")==null || value.get("trades")==null || value.get("trades").toString().equals("0")){
     	    				list11.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("goods").toString())/Double.parseDouble(value.get("trades").toString())).setScale(2,RoundingMode.UP);
     	    				list11.add(bg.doubleValue());
     	    			}
     	    			//客单量
-    	    			if (value.get("goods")==null || value.get("enter")==null || ((BigDecimal)value.get("enter")).equals(0)){
+    	    			if (value.get("goods")==null || value.get("enter")==null || value.get("enter").toString().equals("0")){
     	    				list12.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("goods").toString())/Double.parseDouble(value.get("enter").toString())).setScale(2,RoundingMode.UP);
     	    				list12.add(bg.doubleValue());
     	    			}
     	    			//件单价
-    	    			if (value.get("sales")==null || value.get("goods")==null || ((BigDecimal)value.get("goods")).equals(0)){
+    	    			if (value.get("sales")==null || value.get("goods")==null || value.get("goods").toString().equals("0")){
     	    				list13.add(0.0);
     	    			} else {
         					BigDecimal bg = new BigDecimal(Double.parseDouble(value.get("sales").toString())/Double.parseDouble(value.get("goods").toString())).setScale(2,RoundingMode.UP);
@@ -3207,7 +3207,15 @@ public class ReportDataController {
 			Map<String,Object> resultMap = new HashMap<String,Object>();
 			ArrayList<ArrayList<Integer>> dataList = new ArrayList<ArrayList<Integer>>();
 			if (filterId == 0){
-				ArrayList<HomePage> list = homePageService.getTotalData(false, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), "dh","f");
+    			Integer[] blockSite = roleService.blockSite(request);
+    			Byte siteType = siteService.testSelect(Short.parseShort(site_name)).getType();
+    			ArrayList<HomePage> list = null;
+    			if (siteType == 2){
+    				list = homePageService.getTotalData(true, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), "dh","total",blockSite,null);
+    			} else {
+    				list = homePageService.getTotalData(false, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), "dh","f",blockSite,null);
+    			}
+
 				for (int i=0;i<list.size();i++){
 					ArrayList<Integer> data = new ArrayList<Integer>();
 					Calendar cal = Calendar.getInstance();
@@ -3231,7 +3239,8 @@ public class ReportDataController {
     			return ReturnMapUtil.packData(resultMap);
 			} else 
 			if (filterId == 1){
-    			ArrayList<HomePageByZonetype> list = homePageService.getHomePagebyZonetype(false, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), "dh",1);
+        		Integer[] blockSite = roleService.blockSite(request);
+    			ArrayList<HomePageByZonetype> list = homePageService.getHomePagebyZonetype(false, Integer.parseInt(site_name), sdf.format(new Date(st)), sdf.format(new Date(et)), "dh",1,blockSite,null);
 				String sitezoneName= request.getParameter("sitezoneName");
     			for (int i=0;i<list.size();i++){
     				if (!sitezoneName.equals(list.get(i).getZoneName())){
@@ -3270,6 +3279,8 @@ public class ReportDataController {
         		map.put("siteid", Integer.parseInt(site_name));
         		map.put("names", Integer.parseInt(site_name));
         		map.put("findSite",1);
+    			Integer[] blockSite = roleService.blockSite(request);
+    			map.put("blockSite", blockSite);
         		ArrayList<Map<String,Object>> data1sourcelist = homePageMapper.getCollectData(map);
         		//过去时间
         		Date startTime = new Date(st);
@@ -3288,7 +3299,12 @@ public class ReportDataController {
         		map.put("siteid", Integer.parseInt(site_name));
         		map.put("names", Integer.parseInt(site_name));
         		map.put("findSite",1);
+    			blockSite = roleService.blockSite(request);
+    			map.put("blockSite", blockSite);
         		ArrayList<Map<String,Object>> data2sourcelist = homePageMapper.getCollectData(map);
+        		if (data2sourcelist.size()==0){
+        			return ReturnMapUtil.packError("2", "没数据");
+        		}
         		//数据定义
         		Integer nowPassby = 0;
         		Integer lastPassby = 0;

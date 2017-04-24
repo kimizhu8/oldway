@@ -38,6 +38,31 @@
 		#{countTrades,jdbcType=INTEGER},
 		#{countGoods,jdbcType=INTEGER})
 	</insert>
+	<insert id="insertByMap" parameterType="java.util.Map">
+		insert into records_sales_partitioned (fk_device_zone_id,date_time,count_sales,count_trades,
+		count_goods)
+		values 
+		(
+			#{devicezoneId},
+			#{time},
+			#{countSales},
+			#{countTrades},
+			#{countGoods}
+		)
+	</insert>
+	<update id="updateByMap" parameterType="java.util.Map">
+		update records_sales_partitioned set
+		fk_device_zone_id = #{devicezoneId},
+		date_time = #{time},
+		count_sales = #{countSales},
+		count_trades = #{countTrades},
+		count_goods = #{countGoods}
+		where fk_device_zone_id = #{devicezoneId} and date_time = #{time}
+	</update>
+	<delete  id="deleteByMap" parameterType="java.util.Map">
+		delete from records_sales_partitioned
+		where fk_device_zone_id = #{devicezoneId} and date_time = #{time}
+	</delete>
 	<insert id="insertSelective" parameterType="net.iretailer.rest.model.RecordsSales">
 		insert into records_sales
 		<trim prefix="(" suffix=")" suffixOverrides=",">
@@ -111,13 +136,13 @@
 		where id = #{id,jdbcType=INTEGER}
 	</delete>
 	<select id="selectAll" resultMap="ResultMap">
-		select a.fk_records_id as id,b.fk_device_zone_id as deivcezoneId,c.display_name as devicezoneName, date_format(b.date_time,"%Y-%m-%d %H:%i:%s") as time,a.count_sales as countSales,a.count_trades as countTrades,a.count_goods as countGoods
-		from records_sales a inner join records b on a.fk_records_id=b.id inner join device_zone c on b.fk_device_zone_id=c.id inner join r_sitezone_devicezone d on d.fk_device_zone_id = c.id inner join site_zone e on d.fk_site_zone_id = e.id
-		where b.date=#{date,jdbcType=VARCHAR} and e.fk_site_id = #{siteId,jdbcType=INTEGER} order by b.date_time limit #{page,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER} 
+		select 1 as id,a.fk_device_zone_id as deivcezoneId,c.display_name as devicezoneName, date_format(a.date_time,"%Y-%m-%d %H:%i:%s") as time,a.count_sales as countSales,a.count_trades as countTrades,a.count_goods as countGoods
+		from records_sales_partitioned a inner join device_zone c on a.fk_device_zone_id=c.id inner join r_sitezone_devicezone d on d.fk_device_zone_id = c.id inner join site_zone e on d.fk_site_zone_id = e.id
+		where a.date=#{date,jdbcType=VARCHAR} and e.fk_site_id = #{siteId,jdbcType=INTEGER} order by a.date_time limit #{page,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER} 
 	</select>
 	<select id="getSalesDataCount" resultType = "java.lang.Integer">
 		select count(*)
-		from records_sales a inner join records b on a.fk_records_id=b.id inner join device_zone c on b.fk_device_zone_id=c.id inner join r_sitezone_devicezone d on d.fk_device_zone_id = c.id inner join site_zone e on d.fk_site_zone_id = e.id
- 		where b.date=#{date,jdbcType=VARCHAR} and e.fk_site_id = #{siteId,jdbcType=INTEGER}
+		from records_sales_partitioned a inner join device_zone c on a.fk_device_zone_id=c.id inner join r_sitezone_devicezone d on d.fk_device_zone_id = c.id inner join site_zone e on d.fk_site_zone_id = e.id
+ 		where a.date=#{date,jdbcType=VARCHAR} and e.fk_site_id = #{siteId,jdbcType=INTEGER}
 	</select>
 </mapper>

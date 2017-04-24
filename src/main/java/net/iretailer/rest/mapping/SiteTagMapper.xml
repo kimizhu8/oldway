@@ -90,5 +90,9 @@
   </select>
   <select id="selectTagValue" resultType="java.util.Map" parameterType="java.util.Map">
   	select distinct(_value) as displayName,_value as id from site_tag inner join site on site_tag.fk_site_id = site.id where site_tag.type = #{tagType,jdbcType=VARCHAR} and site.parent_id = #{siteId,jdbcType=INTEGER}
+  	AND site.id in  
+  	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    	#{name,jdbcType=INTEGER}
+    </foreach>
   </select>
 </mapper>

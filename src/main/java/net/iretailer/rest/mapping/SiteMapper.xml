@@ -197,6 +197,10 @@
   </select>
   <select id="selectAllSiteName" parameterType="java.util.Map" resultType="java.util.Map" >
   	select distinct(display_name) as displayName,id as id from site WHERE CASE #{findSite,jdbcType=INTEGER} WHEN 0 THEN id=#{siteId,jdbcType=INTEGER} ELSE parent_id=#{siteId,jdbcType=INTEGER} END
+  	AND id in  
+  	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    	#{name,jdbcType=INTEGER}
+    </foreach>
   </select>
   <select id="selectSiteInfo" parameterType="java.util.Map" resultType="java.util.Map" >
   	select distinct(display_name) as displayName,id as id from site where id=#{siteId,jdbcType=INTEGER}

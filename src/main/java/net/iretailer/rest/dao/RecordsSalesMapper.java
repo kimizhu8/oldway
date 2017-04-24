@@ -1,6 +1,7 @@
 package net.iretailer.rest.dao;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -30,4 +31,10 @@ public interface RecordsSalesMapper {
     ArrayList<SalesDataDTO> selectAll(@Param("page") Integer page,@Param("pageSize") Integer pageSize,@Param("date") String date,@Param("siteId") Integer siteId);
     
     Integer getSalesDataCount(@Param("siteId") Integer siteId,@Param("date") String date);
+    
+    Integer insertByMap(Map<String,Object> map);
+    
+    Integer updateByMap(Map<String,Object> map);
+    
+    Integer deleteByMap(Map<String,Object> map);
 }

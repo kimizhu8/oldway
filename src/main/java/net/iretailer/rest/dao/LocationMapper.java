@@ -21,6 +21,6 @@ public interface LocationMapper {
     
     ArrayList<Location> selectAll();
     
-    ArrayList<Map<String,Object>> selectAllLocationName(HashMap<String,Integer> map);
+    ArrayList<Map<String,Object>> selectAllLocationName(HashMap<String,Object> map);
 
 }

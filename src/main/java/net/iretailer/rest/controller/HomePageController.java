@@ -116,7 +116,8 @@ public class HomePageController {
 			cal.add(Calendar.DATE, 1);
 			comparisonEnd = sdfDate.format(cal.getTime());
 		}
-		ArrayList<Object> list = homepageThreadService.getHomePage(siteId, todayStart, todayEnd, comparisonStart, comparisonEnd);
+		Integer[] blockSite = roleService.blockSite(request);
+		ArrayList<Object> list = homepageThreadService.getHomePage(siteId, todayStart, todayEnd, comparisonStart, comparisonEnd,blockSite);
 		//今天的数据
 		HomePage todayHomePage = (HomePage)list.get(0);
 		//昨天的数据
@@ -246,7 +247,7 @@ public class HomePageController {
 		salesPerManMap.put("id", 6);
 		String salesPerMan = "0.00";
 		change = "0.00";
-		if (nowEnter!=0 && compareEnter!=0){
+		if (nowEnter!=0 && compareEnter!=0&& compareSales!=0) {
 			salesPerMan = df.format(nowSales/nowEnter);
 			change = df.format(((double)nowSales/nowEnter-(double)compareSales/compareEnter)*100/((double)compareSales/compareEnter));
 		}
@@ -309,14 +310,16 @@ public class HomePageController {
 		ArrayList<HomePageByLocation> comparisonHomePage = null;
 		if (siteType==0 || siteType==1 || siteType==3){
 			//今天的数据
-			todayHomePage = homePageService.getHomePageByLocation(false, siteId, todayStart, todayEnd, "d",type);
+			Integer[] blockSite = roleService.blockSite(request);
+			todayHomePage = homePageService.getHomePageByLocation(false, siteId, todayStart, todayEnd, "d",type,blockSite,null);
 			//比较天数的数据
-			comparisonHomePage = homePageService.getHomePageByLocation(false, siteId, comparisonStart, comparisonEnd, "d",type);
+			comparisonHomePage = homePageService.getHomePageByLocation(false, siteId, comparisonStart, comparisonEnd, "d",type,blockSite,null);
 		} else {
+			Integer[] blockSite = roleService.blockSite(request);
 			//今天的数据
-			todayHomePage = homePageService.getHomePageByLocation(true, siteId, todayStart, todayEnd, "d",type);
+			todayHomePage = homePageService.getHomePageByLocation(true, siteId, todayStart, todayEnd, "d",type,blockSite,null);
 			//比较天数的数据
-			comparisonHomePage = homePageService.getHomePageByLocation(true, siteId, comparisonStart, comparisonEnd, "d",type);
+			comparisonHomePage = homePageService.getHomePageByLocation(true, siteId, comparisonStart, comparisonEnd, "d",type,blockSite,null);
 	
 		}
 
@@ -400,15 +403,17 @@ public class HomePageController {
 		ArrayList<HomePageByTag> todayHomePage = null;
 		ArrayList<HomePageByTag> comparisonHomePage = null;
 		if (siteType==0 || siteType==1 || siteType==3){
+			Integer[] blockSite = roleService.blockSite(request);
 			//今天的数据
-			todayHomePage = homePageService.getHomePagebyTag(false, siteId, todayStart, todayEnd, "d","首页");
+			todayHomePage = homePageService.getHomePagebyTag(false, siteId, todayStart, todayEnd, "d","首页",blockSite,null);
 			//比较天数的数据
-			comparisonHomePage = homePageService.getHomePagebyTag(false, siteId, comparisonStart, comparisonEnd, "d","首页");
+			comparisonHomePage = homePageService.getHomePagebyTag(false, siteId, comparisonStart, comparisonEnd, "d","首页",blockSite,null);
 		} else {
+			Integer[] blockSite = roleService.blockSite(request);
 			//今天的数据
-			todayHomePage = homePageService.getHomePagebyTag(true, siteId, todayStart, todayEnd, "d","首页");
+			todayHomePage = homePageService.getHomePagebyTag(true, siteId, todayStart, todayEnd, "d","首页",blockSite,null);
 			//比较天数的数据
-			comparisonHomePage = homePageService.getHomePagebyTag(true, siteId, comparisonStart, comparisonEnd, "d","首页");
+			comparisonHomePage = homePageService.getHomePagebyTag(true, siteId, comparisonStart, comparisonEnd, "d","首页",blockSite,null);
 	
 		}
 
@@ -509,7 +514,8 @@ public class HomePageController {
 		}
 		st = st/1000 + 28800;
 		et = et/1000 + 28800;
-		ArrayList<HomePageByZonetype> list = homePageService.getHomePagebyZonetype(false, Integer.parseInt(siteName), sdfDate.format(new Date(st)), sdfDate.format(new Date(et)), "d",0);
+		Integer[] blockSite = roleService.blockSite(request);
+		ArrayList<HomePageByZonetype> list = homePageService.getHomePagebyZonetype(false, Integer.parseInt(siteName), sdfDate.format(new Date(st)), sdfDate.format(new Date(et)), "d",0,blockSite,null);
 		
 		ArrayList<String> categories = new ArrayList<String>();
 		ArrayList<Integer> data = new ArrayList<Integer>();
@@ -628,12 +634,14 @@ public class HomePageController {
 			}
 			ArrayList<HomePage> list;
     		Byte siteType = siteService.testSelect(Short.parseShort(request.getParameter("siteId"))).getType();
+			Integer[] blockSite = roleService.blockSite(request);
     		if (siteType==0 || siteType==1 || siteType==3){
+
     			list = homePageService.getTotalData(false, siteId, sdf.format(new Date(st)), sdf.format(new Date(et)),
-    					scaleType,"t");
+    					scaleType,"t",blockSite,null);
     		} else {
     			list = homePageService.getTotalData(true, siteId, sdf.format(new Date(st)), sdf.format(new Date(et)),
-    					scaleType,"t");
+    					scaleType,"t",blockSite,null);
     		}
 
 
@@ -685,6 +693,8 @@ public class HomePageController {
     		} else {
             	map.put("findSite", 1);
     		}
+    		Integer[] blockSite = roleService.blockSite(request);
+    		map.put("blockSite", blockSite);
         	ArrayList<Map<String,Object>> list = homePageMapper.getSitezoneDataNoTime(map);
         	ArrayList<Object> categories = new ArrayList<Object>();
         	ArrayList<Object> dataList1 = new ArrayList<Object>();
@@ -711,6 +721,8 @@ public class HomePageController {
         	map.put("siteId",siteId);
         	map.put("locationType",type);
         	map.put("total", "f");
+        	Integer[] blockSite = roleService.blockSite(request);
+        	map.put("blockSite", blockSite);
         	ArrayList<Map<String,Object>> list = homePageMapper.getLocationNoTime(map);
         	ArrayList<Object> categories = new ArrayList<Object>();
         	ArrayList<Object> dataList1 = new ArrayList<Object>();
@@ -737,6 +749,8 @@ public class HomePageController {
         	map.put("siteId",siteId);
         	map.put("tagType",type);
         	map.put("total", "f");
+        	Integer[] blockSite = roleService.blockSite(request);
+        	map.put("blockSite", blockSite);
         	ArrayList<Map<String,Object>> list = homePageMapper.getTagDataNoTime(map);
         	ArrayList<Object> categories = new ArrayList<Object>();
         	ArrayList<Object> dataList1 = new ArrayList<Object>();

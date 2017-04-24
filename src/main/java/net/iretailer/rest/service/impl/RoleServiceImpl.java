@@ -95,6 +95,21 @@ public class RoleServiceImpl implements RoleService{
 		}
 		return flag1;
 	}
-
+	@Override
+	public Integer[] blockSite(HttpServletRequest request) {
+		String loginToken = request.getHeader("Authorization");
+		String userName = loginToken.split("/")[0];
+		
+		User user =userMapper.selectByUserName(userName);
+		Integer roleId = user.getRoleId();
+		Role role = roleMapper.selectByPrimaryKey(roleId);
+		String[] siteList = role.getRoleSite().split(",");
+		
+		Integer[] result = new Integer[siteList.length];
+		for (int i=0;i<siteList.length;i++){
+			result[i] = Integer.parseInt(siteList[i]);
+		}
+		return result;
+	}
 
 }

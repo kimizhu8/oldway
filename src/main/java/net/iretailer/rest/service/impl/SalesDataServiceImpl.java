@@ -2,6 +2,8 @@ package net.iretailer.rest.service.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,37 +27,32 @@ public class SalesDataServiceImpl implements SalesDataService{
 
 	@Override
 	public void insertSalesData(Short devicezoneId,Float sales, Integer trades, Integer goods, Date time) {
-		MainRecords mainRecords = new MainRecords();
-		mainRecords.setDevicezoneId(devicezoneId);
-		mainRecords.setTime(time);
-		recordsSalesMapper.insertMainRecords(mainRecords);
-		Integer id = mainRecords.getId();
-		RecordsSales recordsSales = new RecordsSales();
-		recordsSales.setCountGoods(goods);
-		recordsSales.setCountSales(sales);
-		recordsSales.setCountTrades(trades);
-		recordsSales.setFkRecordsId(id);
-		recordsSalesMapper.insertSelective(recordsSales);
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("devicezoneId", devicezoneId);
+		map.put("time", time);
+		map.put("countGoods", goods);
+		map.put("countSales", sales);
+		map.put("countTrades", trades);
+		recordsSalesMapper.insertByMap(map);
 	}
 
 	@Override
-	public void deleteSalesData(Integer id) {
-		recordsSalesMapper.deleteMainRecords(id);
+	public void deleteSalesData(Date time,Short devicezoneId) {
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("devicezoneId", devicezoneId);
+		map.put("time", time);
+		recordsSalesMapper.deleteByMap(map);
 	}
 
 	@Override
 	public void updateSalesData(Integer id, Short devicezoneId,Float sales, Integer trades, Integer goods, Date time) {
-		MainRecords mainRecords = new MainRecords();
-		mainRecords.setId(id);
-		mainRecords.setDevicezoneId(devicezoneId);
-		mainRecords.setTime(time);
-		recordsSalesMapper.updateMainRecords(mainRecords);
-		RecordsSales recordsSales = new RecordsSales();
-		recordsSales.setCountGoods(goods);
-		recordsSales.setCountSales(sales);
-		recordsSales.setCountTrades(trades);
-		recordsSales.setFkRecordsId(id);
-		recordsSalesMapper.updateByPrimaryKey(recordsSales);
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("devicezoneId", devicezoneId);
+		map.put("time", time);
+		map.put("countGoods", goods);
+		map.put("countSales", sales);
+		map.put("countTrades", trades);
+		recordsSalesMapper.updateByMap(map);
 	}
 
 	@Override

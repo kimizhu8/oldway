@@ -19,4 +19,6 @@ public interface RoleService {
 	public Boolean blockRole(HttpServletRequest request,Integer siteId,Integer menuId);
 	
 	public Boolean blockRole(HttpServletRequest request,Integer menuId);
+	
+	public Integer[] blockSite(HttpServletRequest request);
 }

@@ -23,5 +23,5 @@ public interface SiteZoneMapper {
     
     int deleteSitezones(Short[] ids);
     
-    ArrayList<Map<String,Object>> selectAllSiteZoneName(HashMap<String,Integer> map);
+    ArrayList<Map<String,Object>> selectAllSiteZoneName(HashMap<String,Object> map);
 }

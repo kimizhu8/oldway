@@ -18,6 +18,7 @@ import net.iretailer.rest.model.Device;
 import net.iretailer.rest.model.Site;
 import net.iretailer.rest.model.SiteZone;
 import net.iretailer.rest.service.DeviceService;
+import net.iretailer.rest.service.RoleService;
 import net.iretailer.rest.service.SiteService;
 import net.iretailer.rest.service.SiteZoneService;
 import net.iretailer.rest.util.ReturnMapUtil;
@@ -50,6 +51,10 @@ public class MenuSettingsController {
 	
 	@Autowired
 	private LocationMapper locationMapper;
+	
+	@Autowired
+	private RoleService roleService;
+
 	@RequestMapping("/getSiteList")
 	public Map<String,Object> getSiteList(){
 		ArrayList<Site> rootSites = siteService.getRootSites();
@@ -89,9 +94,10 @@ public class MenuSettingsController {
 	public Map<String,Object> selectAllSiteZoneName(){
 		Integer siteId = Integer.parseInt(request.getParameter("siteId"));
 		Integer sitezoneType = Integer.parseInt(request.getParameter("sitezoneType"));
-		HashMap<String,Integer> map = new HashMap<String,Integer>();
+		HashMap<String,Object> map = new HashMap<String,Object>();
 		map.put("siteId", siteId);
 		map.put("sitezoneType", sitezoneType-2);
+		map.put("names", roleService.blockSite(request));
 		ArrayList<Map<String,Object>> list = sitezoneMapper.selectAllSiteZoneName(map);
 		return ReturnMapUtil.packData(list);
 	}
@@ -102,24 +108,27 @@ public class MenuSettingsController {
 		Integer cateId = Integer.parseInt(request.getParameter("cateId"));
 		Integer siteId = Integer.parseInt(request.getParameter("siteId"));
 		if (filterId == 0 ){
-			HashMap<String,Integer> map = new HashMap<String,Integer>();
+			HashMap<String,Object> map = new HashMap<String,Object>();
 			map.put("siteId", siteId);
+			map.put("names", roleService.blockSite(request));
 			ArrayList<Map<String,Object>> list = siteMapper.selectAllSiteName(map);
 
 			return ReturnMapUtil.packData(list);
 		}
 		if (filterId == 1){
-			HashMap<String,Integer> map = new HashMap<String,Integer>();
+			HashMap<String,Object> map = new HashMap<String,Object>();
 			map.put("siteId", siteId);
 			map.put("findSite", 0);
+			map.put("names", roleService.blockSite(request));
 			ArrayList<Map<String,Object>> list = siteMapper.selectAllSiteName(map);
 			return ReturnMapUtil.packData(list);
 		}
 		if ((filterId == 2)||(filterId==3)||(filterId==4)||(filterId==5)||(filterId==6)){
 			Integer sitezoneType = Integer.parseInt(request.getParameter("sitezoneType"));
-			HashMap<String,Integer> map = new HashMap<String,Integer>();
+			HashMap<String,Object> map = new HashMap<String,Object>();
 			map.put("siteId", siteId);
 			map.put("sitezoneType", sitezoneType-2);
+			map.put("names", roleService.blockSite(request));
 			ArrayList<Map<String,Object>> list = sitezoneMapper.selectAllSiteZoneName(map);
 			return ReturnMapUtil.packData(list);
 		}
@@ -128,13 +137,15 @@ public class MenuSettingsController {
 			HashMap<String,Object> map = new HashMap<String,Object>();
 			map.put("siteId", siteId);
 			map.put("tagType", tagType);
+			map.put("names", roleService.blockSite(request));
 			ArrayList<Map<String,Object>> list = siteTagMapper.selectTagValue(map);
 			return ReturnMapUtil.packData(list);
 		}
 		if ((filterId==8||filterId==9||filterId==10||filterId==11)){
-			HashMap<String,Integer> map = new HashMap<String,Integer>();
+			HashMap<String,Object> map = new HashMap<String,Object>();
 			map.put("siteId", siteId);
 			map.put("locationType", filterId-8);
+			map.put("names", roleService.blockSite(request));
 			ArrayList<Map<String,Object>> list = locationMapper.selectAllLocationName(map);
 			return ReturnMapUtil.packData(list);
 		}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.iretailer.rest.dao.HomePageMapper">
+<mapper namespace="net.iretailer.rest.dao.HomePageMapper1">
   <resultMap id="BaseResultMap" type="net.iretailer.rest.model.HomePage">
     <id column="id" jdbcType="SMALLINT" property="id" />
     <result column="enter" jdbcType="INTEGER" property="enter" />
@@ -388,6 +388,8 @@
 		</if>
 		GROUP BY display_name
   </select>
+  
+  
   <select id="getWeather" parameterType="java.util.Map" resultType="java.util.Map">
 	select * from weather inner join site on weather.fk_location_id = site.fk_location_id where site.id=#{siteId,jdbcType=INTEGER} and weather.date = #{date,jdbcType=VARCHAR}
   </select>

@@ -489,6 +489,7 @@ public class BusinessSettingController {
     		mapLocation.put("value", locationName);
     		mapLocation.put("type",  locations.get(i).getType());
     		mapLocation.put("parentId", locations.get(i).getParentId());
+    		mapLocation.put("id", locations.get(i).getId());
     		siteLocation.add(mapLocation);
     	}
     	for (int i=0;i<4;i++){

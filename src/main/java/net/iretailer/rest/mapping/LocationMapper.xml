@@ -154,5 +154,9 @@ INNER JOIN site
 on location_tmp.id = site.fk_location_id
 WHERE
 	site.parent_id = #{siteId,jdbcType=INTEGER}
+	AND site.id in  
+  	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    	#{name,jdbcType=INTEGER}
+    </foreach>
   </select>
 </mapper>

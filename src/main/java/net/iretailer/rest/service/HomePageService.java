@@ -8,15 +8,15 @@ import net.iretailer.rest.model.HomePageByTag;
 import net.iretailer.rest.model.HomePageByZonetype;
 
 public interface HomePageService {
-	HomePage getHomePage(boolean findchild,Integer siteId,String startTime,String endTime,String type);
+	HomePage getHomePage(boolean findchild,Integer siteId,String startTime,String endTime,String type,Integer[] blockSite,String[] names);
 		
-	ArrayList<HomePageByZonetype> getHomePagebyZonetype(boolean findchild,Integer siteId,String startTime,String endTime,String type,Integer zoneType);
+	ArrayList<HomePageByZonetype> getHomePagebyZonetype(boolean findchild,Integer siteId,String startTime,String endTime,String type,Integer zoneType,Integer[] blockSite,String[] names);
 	
-	ArrayList<HomePage> getTotalData(boolean findchild,Integer siteId,String startTime,String endTime,String type,String total);
+	ArrayList<HomePage> getTotalData(boolean findchild,Integer siteId,String startTime,String endTime,String type,String total,Integer[] blockSite,String[] names);
 	
-	ArrayList<HomePageByTag> getHomePagebyTag(boolean findchild,Integer siteId,String startTime,String endTime,String type,String tagType);
+	ArrayList<HomePageByTag> getHomePagebyTag(boolean findchild,Integer siteId,String startTime,String endTime,String type,String tagType,Integer[] blockSite,String[] names);
 	
-	ArrayList<HomePageByLocation> getHomePageByLocation(boolean findchild,Integer siteId,String startTime,String endTime,String type,Integer locationType);
+	ArrayList<HomePageByLocation> getHomePageByLocation(boolean findchild,Integer siteId,String startTime,String endTime,String type,Integer locationType,Integer[] blockSite,String[] names);
 
 	ArrayList<HomePage> getTotalCompareData(boolean findchild,Integer siteId,String startTime,String endTime);
 	

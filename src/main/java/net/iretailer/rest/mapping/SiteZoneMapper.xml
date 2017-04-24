@@ -141,5 +141,9 @@
   </delete>
   <select id="selectAllSiteZoneName" parameterType="java.util.Map" resultType="java.util.Map" >
   	select distinct(display_name) as displayName,id as id from site_zone where fk_site_id=#{siteId,jdbcType=INTEGER} and type=#{sitezoneType,jdbcType=INTEGER}
+  	AND fk_site_id in  
+  	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    	#{name,jdbcType=INTEGER}
+    </foreach>
   </select>
 </mapper>

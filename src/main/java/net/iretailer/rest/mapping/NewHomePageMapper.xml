@@ -1,0 +1,1329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.iretailer.rest.dao.HomePageMapper">
+  <resultMap id="BaseResultMap" type="net.iretailer.rest.model.HomePage">
+    <id column="id" jdbcType="SMALLINT" property="id" />
+    <result column="enter" jdbcType="INTEGER" property="enter" />
+    <result column="exit" jdbcType="INTEGER" property="exit" />
+    <result column="passby" jdbcType="INTEGER" property="passby" />
+    <result column="sales" jdbcType="DOUBLE" property="sales" />
+    <result column="goods" jdbcType="INTEGER" property="goods" />
+    <result column="trades" jdbcType="INTEGER" property="trades" />
+    <result column="acreage" jdbcType="INTEGER" property="acreage" />
+    <result column="employee_number" jdbcType="INTEGER" property="employeeNumber" />
+    <result column="f_time" jdbcType="VARCHAR" property="time" />
+    <result column="stay_time" jdbcType="DOUBLE" property="stayTime" />
+    <result column="display_name" jdbcType="VARCHAR" property="displayName" />
+  </resultMap>
+  <resultMap id="ZonetypeResultMap" type="net.iretailer.rest.model.HomePageByZonetype">
+    <id column="enter" jdbcType="INTEGER" property="countIn" />
+    <result column="exit" jdbcType="INTEGER" property="countOut" />
+    <result column="zone_type" jdbcType="VARCHAR" property="zoneType" />
+    <result column="zone_name" jdbcType="VARCHAR" property="zoneName" />
+    <result column="f_time" jdbcType="VARCHAR" property="time" />
+    <result column="passby" jdbcType="VARCHAR" property="passby" />
+    <result column="stay_time" jdbcType="DOUBLE" property="stayTime" />
+    <result column="acreage" jdbcType="INTEGER" property="acreage" />
+    <result column="employee_number" jdbcType="INTEGER" property="employeeNumber" />
+  </resultMap>
+  <resultMap id="tagResultMap" type="net.iretailer.rest.model.HomePageByTag">
+    <id column="enter" jdbcType="INTEGER" property="countIn" />
+    <result column="exit" jdbcType="INTEGER" property="countOut" />
+    <result column="tag_value" jdbcType="VARCHAR" property="tagValue" />
+    <result column="passby" jdbcType="VARCHAR" property="passby" />
+    <result column="stay_time" jdbcType="DOUBLE" property="stayTime" />
+    <result column="sales" jdbcType="DOUBLE" property="sales" />
+    <result column="goods" jdbcType="INTEGER" property="goods" />
+    <result column="trades" jdbcType="INTEGER" property="trades" />
+    <result column="acreage" jdbcType="INTEGER" property="acreage" />
+    <result column="employee_number" jdbcType="INTEGER" property="employeeNumber" />
+    <result column="f_time" jdbcType="VARCHAR" property="time" />
+  </resultMap>
+  <resultMap id="locationResultMap" type="net.iretailer.rest.model.HomePageByLocation">
+    <id column="enter" jdbcType="INTEGER" property="countIn" />
+    <result column="exit" jdbcType="INTEGER" property="countOut" />
+    <result column="passby" jdbcType="INTEGER" property="passby" />
+    <result column="location_name" jdbcType="VARCHAR" property="locationName" />
+    <result column="stay_time" jdbcType="DOUBLE" property="stayTime" />
+    <result column="sales" jdbcType="DOUBLE" property="sales" />
+    <result column="goods" jdbcType="INTEGER" property="goods" />
+    <result column="trades" jdbcType="INTEGER" property="trades" />
+    <result column="acreage" jdbcType="INTEGER" property="acreage" />
+    <result column="employee_number" jdbcType="INTEGER" property="employeeNumber" />
+    <result column="f_time" jdbcType="VARCHAR" property="time" />
+    <result column="stay_time" jdbcType="DOUBLE" property="stayTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_device_id, _name, type, disabled, display_name, description, coordinate
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    update device_zone
+    set fk_device_id = #{fkDeviceId,jdbcType=SMALLINT},
+      _name = #{name,jdbcType=VARCHAR},
+      type = #{type,jdbcType=TINYINT},
+      disabled = #{disabled,jdbcType=BIT},
+      display_name = #{displayName,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      coordinate = #{coordinate,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <select id="getHomePage" resultMap="BaseResultMap">
+  <choose>
+	<when test="type == 'd'.toString() or type == 'w'.toString() or type == 'm'.toString() or type == 'q'.toString() or type == 'y'.toString()">
+SELECT
+	timeline.date_time AS f_time,
+	v1.*
+FROM
+	timeline
+LEFT JOIN (
+	SELECT
+	CASE #{type}
+		WHEN 'd' THEN site_day_all_v1.date_day
+		WHEN 'w' THEN site_day_all_v1.weeks
+		WHEN 'm' THEN site_day_all_v1.months
+		WHEN 'q' THEN site_day_all_v1.qtr
+		WHEN 'y' THEN site_day_all_v1.years
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		#{acreage} as acreage,
+		SUM(employee_number_tmp.number) as employee_number,
+		case #{total}
+		WHEN 'f' THEN	site_day_all_v1.display_name ELSE 'total' END as display_name
+	FROM
+		site_day_all_v1 
+	INNER JOIN site ON site_day_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_day_all_v1.site_id and employee_number_tmp.date = site_day_all_v1.date_day)
+	WHERE
+		CASE #{findchild} WHEN 0 THEN site.id = #{siteid} WHEN 1 THEN site.parent_id=#{siteid} END
+		AND site_day_all_v1.date_day>=#{starttime} AND site_day_all_v1.date_day&lt;=#{endtime}
+		AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+	GROUP BY
+		display_name,
+		f_time
+) v1 ON timeline.date_time = v1.f_time
+where timeline.date_time>=#{starttime} AND timeline.date_time&lt;#{endtime}
+and timeline.type=#{type}
+AND (
+	CASE #{type}
+	WHEN '5' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '10' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '15' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '30' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN 'dh' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	ELSE
+		1 = 1
+	END
+);
+	</when>
+	<otherwise>
+SELECT
+	timeline.date_time AS f_time,
+	v1.*
+FROM
+	timeline
+LEFT JOIN (
+	SELECT
+	CASE #{type}
+		WHEN '5' THEN site_5min_all_v1.5min
+		WHEN '10' THEN site_5min_all_v1.10min
+		WHEN '15' THEN site_5min_all_v1.15min
+		WHEN '30' THEN site_5min_all_v1.30min
+		WHEN 'dh' THEN site_5min_all_v1.hrs
+		WHEN 'd2' THEN site_5min_all_v1.date_day
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		#{acreage} as acreage,
+		MAX(employee_number_tmp.number) as employee_number,
+		case #{total}
+		WHEN 'f' THEN	site_5min_all_v1.display_name ELSE 'total' END as display_name
+	FROM
+		site_5min_all_v1
+	INNER JOIN site ON site_5min_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_5min_all_v1.site_id and employee_number_tmp.date = site_5min_all_v1.date_day)
+	WHERE
+		CASE #{findchild} WHEN 0 THEN site.id = #{siteid} WHEN 1 THEN site.parent_id=#{siteid} END
+		AND site_5min_all_v1.5min>=#{starttime} AND site_5min_all_v1.5min&lt;=#{endtime}
+		AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+	GROUP BY
+		display_name,
+		f_time
+) v1 ON timeline.date_time = v1.f_time
+where timeline.date_time>=#{starttime} AND timeline.date_time&lt;#{endtime}
+and timeline.type=(case #{type} when 'd2' then 'd' else #{type} END)
+AND (
+	CASE #{type}
+	WHEN '5' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '10' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '15' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '30' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN 'dh' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	ELSE
+		1 = 1
+	END
+);
+	</otherwise>
+  </choose>
+  </select>
+  <select id="getHomePageByZonetype" resultMap="ZonetypeResultMap">
+  <choose>
+  	<when test="type == 'd'.toString() or type == 'w'.toString() or type == 'm'.toString() or type == 'q'.toString() or type == 'y'.toString()">
+ SELECT
+ timeline.date_time as f_time,
+ V1.*
+ from 
+ timeline 
+ left join(
+SELECT
+	CASE #{type} 
+WHEN 'd' THEN sitezone_day_all_v1.date_day
+WHEN 'w' THEN sitezone_day_all_v1.weeks
+WHEN 'm' THEN sitezone_day_all_v1.months
+WHEN 'q' THEN sitezone_day_all_v1.qtr
+WHEN 'y' THEN sitezone_day_all_v1.years
+END 
+as f_time,
+	SUM(count_in) as enter,
+	SUM(count_out) as `exit`,
+	SUM(count_passby) as passby,
+  	SUM(count_sales) as sales, -- 销售额
+  	SUM(count_goods) as goods, -- 件数
+  	SUM(count_trades) as trades, -- 交易笔数
+	MIN(site.operation_acreage),
+	SUM(stay_time) as stay_time,
+	site.display_name as display_name,
+  	site_zone.type as zone_type,
+	site_zone.display_name as zone_name
+FROM
+	sitezone_day_all_v1 
+	LEFT JOIN site_zone on sitezone_day_all_v1.site_zone_id = site_zone.id
+	LEFT JOIN site on site.id = site_zone.fk_site_id
+WHERE
+		CASE #{findchild} WHEN 0 THEN site.id = #{siteid} WHEN 1 THEN site.parent_id=#{siteid} END
+		AND sitezone_day_all_v1.date_day>=#{starttime} AND sitezone_day_all_v1.date_day &lt;=#{endtime}
+AND site_zone.type=#{zoneType}
+		AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+   	 	<if test="names!=null">
+   	 	AND site_zone.id in 
+		<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+			#{name}
+		</foreach>
+		</if>
+GROUP BY site.id,f_time,zone_type,zone_name
+ORDER BY zone_name,f_time
+ ) V1
+ ON timeline.date_time = V1.f_time
+ where timeline.date_time>=#{starttime} AND timeline.date_time&lt;#{endtime}
+ and timeline.type=#{type} 
+ AND (
+ CASE #{type} 
+  WHEN '5' THEN timeline.only_time>=#{true_start_time} and timeline.only_time&lt;#{true_end_time}   
+  WHEN '10' THEN timeline.only_time>=#{true_start_time} and timeline.only_time&lt;#{true_end_time}
+  WHEN '15' THEN timeline.only_time>=#{true_start_time} and timeline.only_time&lt;#{true_end_time}
+  WHEN '30' THEN timeline.only_time>=#{true_start_time} and timeline.only_time&lt;#{true_end_time}
+  WHEN 'dh' THEN timeline.only_time>=#{true_start_time} and timeline.only_time&lt;#{true_end_time}
+  ELSE 1=1
+  END 
+ );
+  	</when>
+  	<otherwise>
+SELECT
+timeline.date_time as f_time,
+V1.*
+from 
+timeline 
+left join(
+SELECT
+	CASE #{type} 
+WHEN '5' THEN sitezone_5min_all_v1.5min
+WHEN '10' THEN sitezone_5min_all_v1.10min
+WHEN '15' THEN sitezone_5min_all_v1.15min
+WHEN '30' THEN sitezone_5min_all_v1.30min
+WHEN 'dh' THEN sitezone_5min_all_v1.hrs
+END 
+as f_time,
+	SUM(count_in) as enter,
+	SUM(count_out) as `exit`,
+	SUM(count_passby) as passby,
+  SUM(count_sales) as sales, -- 销售额
+  SUM(count_goods) as goods, -- 件数
+  SUM(count_trades) as trades, -- 交易笔数
+	MIN(site.operation_acreage),
+	SUM(stay_time) as stay_time,
+	site.display_name as display_name,
+  site_zone.type as zone_type,
+	site_zone.display_name as zone_name
+FROM
+	sitezone_5min_all_v1
+	LEFT JOIN site_zone on sitezone_5min_all_v1.site_zone_id = site_zone.id
+	LEFT JOIN site on site.id = site_zone.fk_site_id
+WHERE
+		CASE #{findchild} WHEN 0 THEN site.id = #{siteid} WHEN 1 THEN site.parent_id=#{siteid} END
+		AND sitezone_5min_all_v1.5min>=#{starttime} AND sitezone_5min_all_v1.5min&lt;=#{endtime}
+AND site_zone.type=#{zoneType}
+AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+   	 	<if test="names!=null">
+   	 	AND site_zone.id in 
+		<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+			#{name}
+		</foreach>
+		</if>
+GROUP BY site.id,f_time,zone_type,zone_name
+ORDER BY zone_name,f_time
+) V1
+ON timeline.date_time = V1.f_time
+where timeline.date_time>=#{starttime} AND timeline.date_time&lt;#{endtime}
+and timeline.type=#{type}
+AND (
+CASE #{type} 
+ WHEN '5' THEN timeline.only_time>=#{true_start_time} and timeline.only_time&lt;#{true_end_time}   
+ WHEN '10' THEN timeline.only_time>=#{true_start_time} and timeline.only_time&lt;#{true_end_time}
+ WHEN '15' THEN timeline.only_time>=#{true_start_time} and timeline.only_time&lt;#{true_end_time}
+ WHEN '30' THEN timeline.only_time>=#{true_start_time} and timeline.only_time&lt;#{true_end_time}
+ WHEN 'dh' THEN timeline.only_time>=#{true_start_time} and timeline.only_time&lt;#{true_end_time}
+ ELSE 1=1
+ END 
+);  	
+  	</otherwise>
+  </choose>
+
+  </select>
+  <select id="getTotalData" resultMap="BaseResultMap">
+  	  <choose>
+	<when test="type == 'd'.toString() or type == 'w'.toString() or type == 'm'.toString() or type == 'q'.toString() or type == 'y'.toString()">
+SELECT
+	timeline.date_time AS f_time,
+	v1.*
+FROM
+	timeline
+LEFT JOIN (
+	SELECT
+	CASE #{type}
+		WHEN 'd' THEN site_day_all_v1.date_day
+		WHEN 'w' THEN site_day_all_v1.weeks
+		WHEN 'm' THEN site_day_all_v1.months
+		WHEN 'q' THEN site_day_all_v1.qtr
+		WHEN 'y' THEN site_day_all_v1.years
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		#{acreage} as acreage,
+		sum(employee_number_tmp.number) as employee_number,
+		case #{total}
+		WHEN 'f' THEN	site_day_all_v1.display_name ELSE 'total' END as display_name
+	FROM
+		site_day_all_v1 
+	INNER JOIN site ON site_day_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_day_all_v1.site_id and employee_number_tmp.date = site_day_all_v1.date_day)
+	WHERE
+		CASE #{findchild} WHEN 0 THEN site.id = #{siteid} WHEN 1 THEN site.parent_id=#{siteid} END
+		AND site_day_all_v1.date_day>=#{starttime} AND site_day_all_v1.date_day&lt;=#{endtime}
+		AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+		<if test="names!=null">   	 	
+   	 	AND site.id in
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+   	 	</if>
+	GROUP BY
+		display_name,
+		f_time
+) v1 ON timeline.date_time = v1.f_time
+where timeline.date_time>=#{starttime} AND timeline.date_time&lt;#{endtime}
+and timeline.type=#{type}
+AND (
+	CASE #{type}
+	WHEN '5' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '10' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '15' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '30' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN 'dh' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	ELSE
+		1 = 1
+	END
+);
+	</when>
+	<otherwise>
+SELECT
+	timeline.date_time AS f_time,
+	v1.*
+FROM
+	timeline
+LEFT JOIN (
+	SELECT
+	CASE #{type}
+		WHEN '5' THEN site_5min_all_v1.5min
+		WHEN '10' THEN site_5min_all_v1.10min
+		WHEN '15' THEN site_5min_all_v1.15min
+		WHEN '30' THEN site_5min_all_v1.30min
+		WHEN 'dh' THEN site_5min_all_v1.hrs
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		#{acreage} as acreage,
+		max(employee_number_tmp.number) as employee_number,
+		case #{total}
+		WHEN 'f' THEN	site_5min_all_v1.display_name ELSE 'total' END as display_name
+	FROM
+		site_5min_all_v1
+	INNER JOIN site ON site_5min_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_5min_all_v1.site_id and employee_number_tmp.date = site_5min_all_v1.date_day)
+	WHERE
+		CASE #{findchild} WHEN 0 THEN site.id = #{siteid} WHEN 1 THEN site.parent_id=#{siteid} END
+		AND site_5min_all_v1.5min>=#{starttime} AND site_5min_all_v1.5min&lt;=#{endtime}
+		AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+
+   	 	<if test="names!=null">
+   	 	AND site.id in
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+   	 	</if>
+	GROUP BY
+		display_name,
+		f_time
+) v1 ON timeline.date_time = v1.f_time
+where timeline.date_time>=#{starttime} AND timeline.date_time&lt;#{endtime}
+and timeline.type=#{type}
+AND (
+	CASE #{type}
+	WHEN '5' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '10' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '15' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '30' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN 'dh' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	ELSE
+		1 = 1
+	END
+);
+	</otherwise>
+  </choose>
+   </select>
+  <select id="getHomePageByTag" resultMap="tagResultMap">
+  	<choose>
+  		<when test="type == 'd'.toString() or type == 'w'.toString() or type == 'm'.toString() or type == 'q'.toString() or type == 'y'.toString()">
+  		SELECT
+	timeline.date_time AS f_time,
+	v1.*
+FROM
+	timeline
+LEFT JOIN (
+	SELECT
+	CASE #{type}
+		WHEN 'd' THEN site_day_all_v1.date_day
+		WHEN 'w' THEN site_day_all_v1.weeks
+		WHEN 'm' THEN site_day_all_v1.months
+		WHEN 'q' THEN site_day_all_v1.qtr
+		WHEN 'y' THEN site_day_all_v1.years
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		#{acreage} as acreage,
+		sum(employee_number_tmp.number) as employee_number,
+		site_tag._value as tag_value
+	FROM
+		site_day_all_v1
+	INNER JOIN site ON site_day_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_day_all_v1.site_id and employee_number_tmp.date = site_day_all_v1.date_day)
+	LEFT JOIN site_tag ON site_tag.fk_site_id = site.id
+	WHERE
+		CASE #{findchild} WHEN 0 THEN site.id = #{siteid} WHEN 1 THEN site.parent_id=#{siteid} END
+		AND site_day_all_v1.date_day>=#{starttime} AND site_day_all_v1.date_day&lt;=#{endtime}
+		AND site_tag.type=#{tagType}
+		AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+   	 	<if test="names!=null">
+   	 	AND site_tag._value in
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+   	 	</if>
+	GROUP BY
+		tag_value,
+		f_time
+) v1 ON timeline.date_time = v1.f_time
+where timeline.date_time>=#{starttime} AND timeline.date_time&lt;#{endtime}
+and timeline.type=#{type}
+AND (
+	CASE #{type}
+	WHEN '5' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '10' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '15' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '30' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN 'dh' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	ELSE
+		1 = 1
+	END
+);
+  		</when>
+  		<otherwise>
+ SELECT
+	timeline.date_time AS f_time,
+	v1.*
+FROM
+	timeline
+LEFT JOIN (
+	SELECT
+	CASE #{type}
+		WHEN '5' THEN site_5min_all_v1.5min
+		WHEN '10' THEN site_5min_all_v1.10min
+		WHEN '15' THEN site_5min_all_v1.15min
+		WHEN '30' THEN site_5min_all_v1.30min
+		WHEN 'dh' THEN site_5min_all_v1.hrs
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		#{acreage} as acreage,
+		MAX(employee_number_tmp.number) as employee_number,
+		site_tag._value as tag_value
+	FROM
+		site_5min_all_v1
+	INNER JOIN site ON site_5min_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_5min_all_v1.site_id and employee_number_tmp.date = site_5min_all_v1.date_day)
+	LEFT JOIN site_tag ON site_tag.fk_site_id = site.id
+	WHERE
+		CASE #{findchild} WHEN 0 THEN site.id = #{siteid} WHEN 1 THEN site.parent_id= #{siteid} END
+		AND site_5min_all_v1.5min>=#{starttime} AND site_5min_all_v1.5min&lt;=#{endtime}
+		AND site_tag.type=#{tagType}
+		AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+   	 	<if test="names!=null">
+   	 	AND site_tag._value in
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+   	 	</if>
+	GROUP BY
+		tag_value,
+		f_time
+) v1 ON timeline.date_time = v1.f_time
+where timeline.date_time>=#{starttime} AND timeline.date_time&lt;#{endtime}
+and timeline.type=#{type}
+AND (
+	CASE #{type}
+	WHEN '5' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '10' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '15' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '30' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN 'dh' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	ELSE
+		1 = 1
+	END
+); 		
+  		</otherwise>
+  	</choose>
+    
+  </select>
+  <select id="getHomePageByLocation" resultMap="locationResultMap">
+  	<choose>
+  		<when test="type == 'd'.toString() or type == 'w'.toString() or type == 'm'.toString() or type == 'q'.toString() or type == 'y'.toString()">
+  		SELECT
+	timeline.date_time AS f_time,
+	v1.*
+FROM
+	timeline
+LEFT JOIN (
+	SELECT
+	CASE #{type}
+		WHEN 'd' THEN site_day_all_v1.date_day
+		WHEN 'w' THEN site_day_all_v1.weeks
+		WHEN 'm' THEN site_day_all_v1.months
+		WHEN 'q' THEN site_day_all_v1.qtr
+		WHEN 'y' THEN site_day_all_v1.years
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		#{acreage} as acreage,
+		sum(employee_number_tmp.number) as employee_number,
+		IFNULL(CASE #{locationType}
+		WHEN 0 THEN location_tmp.quare_name
+		WHEN 1 THEN location_tmp.province_name
+		WHEN 2 THEN location_tmp.city_name
+		WHEN 3 THEN location_tmp.county_name
+		END,'未分类')
+		as location_name
+	FROM
+		site_day_all_v1
+	INNER JOIN site ON site_day_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_day_all_v1.site_id and employee_number_tmp.date = site_day_all_v1.date_day)
+	INNER JOIN location_tmp on location_tmp.id = site.fk_location_id
+	INNER JOIN location on location.id = site.fk_location_id
+	WHERE
+		CASE #{findchild} WHEN 0 THEN site.id = #{siteid} WHEN 1 THEN site.parent_id=#{siteid} END
+		AND site_day_all_v1.date_day>=#{starttime} AND site_day_all_v1.date_day&lt;=#{endtime}
+		AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+   	 	<if test="names!=null">
+   	 	AND (
+		(
+			ifnull(CASE #{locationType,jdbcType=INTEGER} 
+			WHEN 0 then location_tmp.quare_id
+			WHEN 1 then location_tmp.province_id
+			WHEN 2 then location_tmp.city_id
+			WHEN 3 then location_tmp.county_id
+			END,'未分类')
+		) in   
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+   	 	)
+		</if>
+	GROUP BY
+		location_name,
+		f_time
+) v1 ON timeline.date_time = v1.f_time
+where timeline.date_time>=#{starttime} AND timeline.date_time&lt;#{endtime}
+and timeline.type=#{type}
+AND (
+	CASE #{type}
+	WHEN '5' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '10' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '15' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '30' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN 'dh' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	ELSE
+		1 = 1
+	END
+);
+  		</when>
+  		<otherwise>
+SELECT
+	timeline.date_time AS f_time,
+	v1.*
+FROM
+	timeline
+LEFT JOIN (
+	SELECT
+	CASE #{type}
+		WHEN '5' THEN site_5min_all_v1.5min
+		WHEN '10' THEN site_5min_all_v1.10min
+		WHEN '15' THEN site_5min_all_v1.15min
+		WHEN '30' THEN site_5min_all_v1.30min
+		WHEN 'dh' THEN site_5min_all_v1.hrs
+		WHEN 'd2' THEN site_5min_all_v1.date_day
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		#{acreage} as acreage,
+		MAX(employee_number_tmp.number) as employee_number,
+		IFNULL(CASE #{locationType}
+		WHEN 0 THEN location_tmp.quare_name
+		WHEN 1 THEN location_tmp.province_name
+		WHEN 2 THEN location_tmp.city_name
+		WHEN 3 THEN location_tmp.county_name
+		END,'未分类')
+		as location_name
+	FROM
+		site_5min_all_v1
+	INNER JOIN site ON site_5min_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_5min_all_v1.site_id and employee_number_tmp.date = site_5min_all_v1.date_day)
+	INNER JOIN location_tmp on location_tmp.id = site.fk_location_id
+	INNER JOIN location on location.id = site.fk_location_id
+	WHERE
+		CASE #{findchild} WHEN 0 THEN site.id = #{siteid} WHEN 1 THEN site.parent_id=#{siteid} END
+		AND site_5min_all_v1.5min>=#{starttime} AND site_5min_all_v1.5min&lt;=#{endtime}
+		AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+   	 	<if test="names!=null">
+   	 	AND (
+		(
+			ifnull(CASE #{locationType,jdbcType=INTEGER} 
+			WHEN 0 then location_tmp.quare_id
+			WHEN 1 then location_tmp.province_id
+			WHEN 2 then location_tmp.city_id
+			WHEN 3 then location_tmp.county_id
+			END,'未分类')
+		) in   
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+   	 	)
+		</if>
+	GROUP BY
+		location_name,
+		f_time
+) v1 ON timeline.date_time = v1.f_time
+where timeline.date_time>=#{starttime} AND timeline.date_time&lt;#{endtime}
+and timeline.type=(case #{type} when 'd2' then 'd' else #{type} END)
+AND (
+	CASE #{type}
+	WHEN '5' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '10' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '15' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN '30' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	WHEN 'dh' THEN
+		timeline.only_time >= #{true_start_time}
+	AND timeline.only_time &lt; #{true_end_time}
+	ELSE
+		1 = 1
+	END
+);  		
+  		</otherwise>
+  	</choose>
+    
+  </select>
+  <select id="getTotalCompareData" resultMap="BaseResultMap">
+  	CALL New_TotalCompareData(#{findchild,jdbcType=BIT},#{siteid,jdbcType=INTEGER},#{starttime,jdbcType=VARCHAR},#{endtime,jdbcType=VARCHAR})
+  </select>
+  <select id="getTotalCompareDataSitezone" resultMap="ZonetypeResultMap">
+    CALL New_TotalSitezoneData(#{findchild,jdbcType=BIT},#{siteid,jdbcType=INTEGER},#{starttime,jdbcType=VARCHAR},#{endtime,jdbcType=VARCHAR},#{zoneType,jdbcType=INTEGER})
+  </select>
+  <select id="getCollectSitezoneData" parameterType="java.util.Map" resultType="java.util.Map">
+	<choose>
+		<when test="type == 'd'.toString() or type == 'w'.toString() or type == 'm'.toString() or type == 'q'.toString() or type == 'y'.toString()">
+	SELECT
+	CASE #{type,jdbcType=VARCHAR} 
+		WHEN 'd' THEN sitezone_day_all_v1.date_day
+		WHEN 'w' THEN sitezone_day_all_v1.weeks
+		WHEN 'm' THEN sitezone_day_all_v1.months
+		WHEN 'q' THEN sitezone_day_all_v1.qtr
+		WHEN 'y' THEN sitezone_day_all_v1.years
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(stay_time) as stay_time
+	FROM
+		sitezone_day_all_v1
+	INNER JOIN site_zone ON sitezone_day_all_v1.site_zone_id = site_zone.id
+	INNER JOIN site ON site_zone.fk_site_id = site.id
+	WHERE
+		site.id = #{siteid,jdbcType=INTEGER}
+		AND sitezone_day_all_v1.date_day>=#{starttime,jdbcType=VARCHAR} AND sitezone_day_all_v1.date_day &lt;=#{endtime,jdbcType=VARCHAR}
+		AND site_zone.type=#{zoneType,jdbcType=INTEGER}
+		AND site_zone.id in 
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+   	 	AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+	GROUP BY f_time ORDER BY f_time;  	
+		</when>
+		<otherwise>
+	SELECT
+	CASE #{type,jdbcType=VARCHAR} 
+		WHEN '5' THEN sitezone_5min_all_v1.5min
+		WHEN '10' THEN sitezone_5min_all_v1.10min
+		WHEN '15' THEN sitezone_5min_all_v1.15min
+		WHEN '30' THEN sitezone_5min_all_v1.30min
+		WHEN 'dh' THEN sitezone_5min_all_v1.hrs
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(stay_time) as stay_time
+	FROM
+		sitezone_5min_all_v1
+	INNER JOIN site_zone ON sitezone_5min_all_v1.site_zone_id = site_zone.id
+	INNER JOIN site ON site_zone.fk_site_id = site.id
+	WHERE
+		site.id = #{siteid,jdbcType=INTEGER}
+		AND sitezone_5min_all_v1.5min>=#{starttime,jdbcType=VARCHAR} AND sitezone_5min_all_v1.5min &lt;=#{endtime,jdbcType=VARCHAR}
+		AND site_zone.type=#{zoneType,jdbcType=INTEGER}
+		AND site_zone.id in 
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+   	 	AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+	GROUP BY f_time ORDER BY f_time;  
+	</otherwise>
+	</choose>
+  </select>
+  <select id="getCollectData" parameterType="java.util.Map" resultType="java.util.Map">
+	<choose>
+		<when test="type == 'd'.toString() or type == 'w'.toString() or type == 'm'.toString() or type == 'q'.toString() or type == 'y'.toString()">
+	SELECT
+	CASE #{type,jdbcType=VARCHAR} 
+		WHEN 'd' THEN site_day_all_v1.date_day
+		WHEN 'w' THEN site_day_all_v1.weeks
+		WHEN 'm' THEN site_day_all_v1.months
+		WHEN 'q' THEN site_day_all_v1.qtr
+		WHEN 'y' THEN site_day_all_v1.years
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		sum(site.operation_acreage) as acreage,
+		sum(employee_number_tmp.number) as employee_number
+	FROM
+		site_day_all_v1
+	INNER JOIN site ON site_day_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_day_all_v1.site_id and employee_number_tmp.date = site_day_all_v1.date_day)
+	WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 1 THEN site.id=#{siteid,jdbcType=INTEGER} ELSE site.parent_id=#{siteid,jdbcType=INTEGER} END
+		AND site_day_all_v1.date_day>=#{starttime,jdbcType=VARCHAR} AND site_day_all_v1.date_day &lt;=#{endtime,jdbcType=VARCHAR}
+		<if test="findSite == null">
+		AND site.id in
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+    	</if>
+    	AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+	GROUP BY f_time ORDER BY f_time;  	
+		</when>
+		<otherwise>
+	SELECT
+	CASE #{type,jdbcType=VARCHAR} 
+		WHEN '5' THEN site_5min_all_v1.5min
+		WHEN '10' THEN site_5min_all_v1.10min
+		WHEN '15' THEN site_5min_all_v1.15min
+		WHEN '30' THEN site_5min_all_v1.30min
+		WHEN 'dh' THEN site_5min_all_v1.hrs
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		max(site.operation_acreage) as acreage,
+		MAX(employee_number_tmp.number) as employee_number
+	FROM
+		site_5min_all_v1
+	INNER JOIN site ON site_5min_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_5min_all_v1.site_id and employee_number_tmp.date = site_5min_all_v1.date_day)
+	WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 1 THEN site.id = #{siteid,jdbcType=INTEGER} ELSE site.parent_id=#{siteid,jdbcType=INTEGER} END
+		AND site_5min_all_v1.5min>=#{starttime,jdbcType=VARCHAR} AND site_5min_all_v1.5min &lt;=#{endtime,jdbcType=VARCHAR}
+	<if test="findSite == null">
+		AND site.id in
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+    </if>
+       	AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+	GROUP BY f_time ORDER BY f_time;
+		</otherwise>
+	</choose>
+
+  </select>
+  <select id="getCollectLocationData" parameterType="java.util.Map" resultType="java.util.Map">
+  	<choose>
+		<when test="type == 'd'.toString() or type == 'w'.toString() or type == 'm'.toString() or type == 'q'.toString() or type == 'y'.toString()">
+	SELECT
+	CASE #{type,jdbcType=VARCHAR} 
+		WHEN 'd' THEN site_day_all_v1.date_day
+		WHEN 'w' THEN site_day_all_v1.weeks
+		WHEN 'm' THEN site_day_all_v1.months
+		WHEN 'q' THEN site_day_all_v1.qtr
+		WHEN 'y' THEN site_day_all_v1.years
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		sum(site.operation_acreage) as acreage,
+		sum(employee_number_tmp.number) as employee_number
+	FROM
+		site_day_all_v1
+	INNER JOIN site ON site_day_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_day_all_v1.site_id and employee_number_tmp.date = site_day_all_v1.date_day)
+	INNER JOIN location_tmp on location_tmp.id = site.fk_location_id
+	WHERE
+		site.parent_id=#{siteid,jdbcType=INTEGER}
+		AND site_day_all_v1.date_day>=#{starttime,jdbcType=VARCHAR} AND site_day_all_v1.date_day &lt;=#{endtime,jdbcType=VARCHAR}
+		AND (
+		(
+			CASE #{locationType,jdbcType=INTEGER} 
+			WHEN 0 then location_tmp.quare_id
+			WHEN 1 then location_tmp.province_id
+			WHEN 2 then location_tmp.city_id
+			WHEN 3 then location_tmp.county_id
+			END
+		) in   
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+   	 	or (
+			CASE #{locationType,jdbcType=INTEGER} 
+			WHEN 0 then location_tmp.quare_id
+			WHEN 1 then location_tmp.province_id
+			WHEN 2 then location_tmp.city_id
+			WHEN 3 then location_tmp.county_id
+			END
+		) is null)
+		AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+	GROUP BY f_time ORDER BY f_time;  			
+  		</when>
+  		<otherwise>
+	SELECT
+	CASE #{type,jdbcType=VARCHAR} 
+		WHEN '5' THEN site_5min_all_v1.5min
+		WHEN '10' THEN site_5min_all_v1.10min
+		WHEN '15' THEN site_5min_all_v1.15min
+		WHEN '30' THEN site_5min_all_v1.30min
+		WHEN 'dh' THEN site_5min_all_v1.hrs
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		max(site.operation_acreage) as acreage,
+		MAX(employee_number_tmp.number) as employee_number
+	FROM
+		site_5min_all_v1
+	INNER JOIN site ON site_5min_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_5min_all_v1.site_id and employee_number_tmp.date = site_5min_all_v1.date_day)
+	INNER JOIN location_tmp on location_tmp.id = site.fk_location_id
+	WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 0 THEN site.id = #{siteid,jdbcType=INTEGER} ELSE site.parent_id=#{siteid,jdbcType=INTEGER} END
+		AND site_5min_all_v1.5min>=#{starttime,jdbcType=VARCHAR} AND site_5min_all_v1.5min &lt;=#{endtime,jdbcType=VARCHAR}
+	AND (
+	(
+		CASE #{locationType,jdbcType=INTEGER} 
+		WHEN 0 then location_tmp.quare_id
+		WHEN 1 then location_tmp.province_id
+		WHEN 2 then location_tmp.city_id
+		WHEN 3 then location_tmp.county_id
+		END
+	) in
+     <foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 </foreach>
+   	 	or (
+			CASE #{locationType,jdbcType=INTEGER} 
+			WHEN 0 then location_tmp.quare_id
+			WHEN 1 then location_tmp.province_id
+			WHEN 2 then location_tmp.city_id
+			WHEN 3 then location_tmp.county_id
+			END
+		) is null)
+		 AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+	GROUP BY f_time ORDER BY f_time;  		
+  		</otherwise>
+  	</choose>
+  </select>
+  
+  <select id="getCollectTagData" parameterType="java.util.Map" resultType="java.util.Map">
+  	<choose>
+		<when test="type == 'd'.toString() or type == 'w'.toString() or type == 'm'.toString() or type == 'q'.toString() or type == 'y'.toString()">
+	SELECT
+	CASE #{type,jdbcType=VARCHAR} 
+		WHEN 'd' THEN site_day_all_v1.date_day
+		WHEN 'w' THEN site_day_all_v1.weeks
+		WHEN 'm' THEN site_day_all_v1.months
+		WHEN 'q' THEN site_day_all_v1.qtr
+		WHEN 'y' THEN site_day_all_v1.years
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		sum(site.operation_acreage) as acreage,
+		sum(employee_number_tmp.number) as employee_number
+	FROM
+		site_day_all_v1
+	INNER JOIN site ON site_day_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_day_all_v1.site_id and employee_number_tmp.date = site_day_all_v1.date_day)
+	LEFT JOIN site_tag ON site_tag.fk_site_id = site.id
+	WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 0 THEN site.id = #{siteid,jdbcType=INTEGER} ELSE site.parent_id=#{siteid,jdbcType=INTEGER} END
+		AND site_day_all_v1.date_day>=#{starttime,jdbcType=VARCHAR} AND site_day_all_v1.date_day &lt;=#{endtime,jdbcType=VARCHAR}
+		<if test="findSite == null">
+		AND site_tag._value in
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+    	</if>
+    	AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+	GROUP BY f_time ORDER BY f_time;  		
+  		</when>
+  		<otherwise>
+	SELECT
+	CASE #{type,jdbcType=VARCHAR} 
+		WHEN '5' THEN site_5min_all_v1.5min
+		WHEN '10' THEN site_5min_all_v1.10min
+		WHEN '15' THEN site_5min_all_v1.15min
+		WHEN '30' THEN site_5min_all_v1.30min
+		WHEN 'dh' THEN site_5min_all_v1.hrs
+	END as f_time,
+		sum(count_in) as enter,
+		sum(count_out) as `exit`,
+		sum(count_passby) as passby,
+		sum(count_sales) as sales,
+		sum(count_goods) as goods,
+		sum(count_trades) as trades,
+		sum(stay_time) as stay_time,
+		max(site.operation_acreage) as acreage,
+		MAX(employee_number_tmp.number) as employee_number
+	FROM
+		site_5min_all_v1
+	INNER JOIN site ON site_5min_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_5min_all_v1.site_id and employee_number_tmp.date = site_5min_all_v1.date_day)
+	LEFT JOIN site_tag ON site_tag.fk_site_id = site.id
+	WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 0 THEN site.id = #{siteid,jdbcType=INTEGER} ELSE site.parent_id=#{siteid,jdbcType=INTEGER} END
+		AND site_5min_all_v1.5min>=#{starttime,jdbcType=VARCHAR} AND site_5min_all_v1.5min &lt;=#{endtime,jdbcType=VARCHAR}
+	<if test="findSite == null">
+		AND site_tag._value in
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+    </if>
+       	AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+	GROUP BY f_time ORDER BY f_time;  		
+  		</otherwise>
+  	</choose>
+  </select>
+  <select id="getCollectDataNoTime" parameterType="java.util.Map" resultType="java.util.Map">
+  	select
+	IFNULL(SUM(count_in),0) as enter,
+	IFNULL(SUM(count_out),0) as `exit`,
+	IFNULL(SUM(count_passby),0) as passby,
+    IFNULL(SUM(count_sales),0) as sales, 
+  	IFNULL(SUM(count_goods),0) as goods, 
+    IFNULL(SUM(count_trades),0) as trades, 
+    IFNULL(SUM(stay_time),0) as stay_time,
+	sum(site.operation_acreage) as acreage,
+	SUM(employee_number_tmp.number) as employee_number,
+	case #{total,jdbcType=VARCHAR} WHEN 'f' THEN site_day_all_v1.display_name ELSE 'total' END as display_name
+	FROM
+	site_day_all_v1
+	INNER JOIN site ON site_day_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_day_all_v1.site_id and employee_number_tmp.date = site_day_all_v1.date_day)
+	WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 0 THEN site.id = #{siteId,jdbcType=INTEGER} WHEN 1 THEN site.parent_id=#{siteId,jdbcType=INTEGER} END
+		AND site_day_all_v1.date_day>=#{startTime,jdbcType=VARCHAR} AND site_day_all_v1.date_day &lt;=#{endTime,jdbcType=VARCHAR}
+		<if test="names != null">
+		AND site.id in
+       	<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+    		#{name}
+   	 	</foreach>
+    	</if>
+    	AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+	GROUP BY display_name
+  </select>
+  <select id="getSitezoneDataNoTime" parameterType="java.util.Map" resultType="java.util.Map">
+  	select
+	IFNULL(SUM(count_in),0) as enter,
+	IFNULL(SUM(count_out),0) as `exit`,
+	IFNULL(SUM(count_passby),0) as passby,
+    IFNULL(SUM(count_sales),0) as sales, 
+  	IFNULL(SUM(count_goods),0) as goods, 
+    IFNULL(SUM(count_trades),0) as trades, 
+    IFNULL(SUM(stay_time),0) as stay_time,
+	sum(site.operation_acreage) as acreage,
+	SUM(employee_number_tmp.number) as employee_number,
+	case #{total,jdbcType=VARCHAR} WHEN 'f' THEN site_zone.display_name ELSE 'total' END as zone_name
+	FROM
+	sitezone_day_all_v1
+	INNER JOIN site_zone ON sitezone_day_all_v1.site_zone_id =site_zone.id
+	INNER JOIN site ON site_zone.fk_site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site.id and employee_number_tmp.date = sitezone_day_all_v1.date_day)
+	WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 0 THEN site.id = #{siteId,jdbcType=INTEGER} WHEN 1 THEN site.parent_id=#{siteId,jdbcType=INTEGER} END
+	AND sitezone_day_all_v1.date_day>=#{startTime,jdbcType=VARCHAR} AND sitezone_day_all_v1.date_day &lt;=#{endTime,jdbcType=VARCHAR}
+	AND site_zone.type=#{zoneType,jdbcType=INTEGER}
+	<if test="names!=null">
+		AND site_zone.id in 
+		<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+			#{name}
+		</foreach>
+	</if>
+		 AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+	GROUP BY zone_name
+  </select>
+  <select id="getTagDataNoTime" parameterType="java.util.Map" resultType="java.util.Map">
+	SELECT
+	IFNULL(SUM(count_in),0) as enter,
+	IFNULL(SUM(count_out),0) as `exit`,
+	IFNULL(SUM(count_passby),0) as passby,
+    IFNULL(SUM(count_sales),0) as sales, 
+  	IFNULL(SUM(count_goods),0) as goods, 
+    IFNULL(SUM(count_trades),0) as trades, 
+    IFNULL(SUM(stay_time),0) as stay_time,
+	sum(site.operation_acreage) as acreage,
+	SUM(employee_number_tmp.number) as employee_number,
+	case #{total,jdbcType=VARCHAR} WHEN 'f' THEN site_tag._value ELSE 'total' END as display_name
+	FROM
+	site_day_all_v1
+	INNER JOIN site ON site_day_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_day_all_v1.site_id and employee_number_tmp.date = site_day_all_v1.date_day)
+	LEFT JOIN site_tag ON site_tag.fk_site_id=site_day_all_v1.site_id
+	WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 0 THEN site.id = #{siteId,jdbcType=INTEGER} WHEN 1 THEN site.parent_id=#{siteId,jdbcType=INTEGER} END
+		AND site_day_all_v1.date_day>=#{startTime,jdbcType=VARCHAR} AND site_day_all_v1.date_day &lt;=#{endTime,jdbcType=VARCHAR}
+	AND site_tag.type=#{tagType,jdbcType=VARCHAR}
+	<if test="names!=null">
+		AND site_tag._value in 
+		<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+			#{name}
+		</foreach>
+	</if>
+	   	AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+	GROUP BY display_name
+  </select>
+  <select id="getLocationNoTime" parameterType="java.util.Map" resultType="java.util.Map">
+  	SELECT
+	IFNULL(SUM(count_in),0) as enter,
+	IFNULL(SUM(count_out),0) as `exit`,
+	IFNULL(SUM(count_passby),0) as passby,
+    IFNULL(SUM(count_sales),0) as sales, 
+  	IFNULL(SUM(count_goods),0) as goods, 
+    IFNULL(SUM(count_trades),0) as trades, 
+    IFNULL(SUM(stay_time),0) as stay_time,
+	sum(site.operation_acreage) as acreage,
+	SUM(employee_number_tmp.number) as employee_number,
+ 	case #{total,jdbcType=VARCHAR} WHEN 'f' THEN
+	IFNULL(CASE #{locationType,jdbcType=VARCHAR}
+			WHEN 0 THEN location_tmp.quare_name
+			WHEN 1 THEN location_tmp.province_name
+			WHEN 2 THEN location_tmp.city_name
+			WHEN 3 THEN location_tmp.county_name
+			END,'未分类')
+		ELSE 'total' END
+		as display_name
+		FROM
+	site_day_all_v1
+	INNER JOIN site ON site_day_all_v1.site_id = site.id
+	LEFT JOIN employee_number_tmp on (employee_number_tmp.fk_site_id = site_day_all_v1.site_id and employee_number_tmp.date = site_day_all_v1.date_day)
+	INNER JOIN location_tmp on location_tmp.id = site.fk_location_id
+		WHERE
+		CASE #{findSite,jdbcType=INTEGER} WHEN 0 THEN site.id = #{siteId,jdbcType=INTEGER} WHEN 1 THEN site.parent_id=#{siteId,jdbcType=INTEGER} END
+		AND site_day_all_v1.date_day>=#{startTime,jdbcType=VARCHAR} AND site_day_all_v1.date_day &lt;=#{endTime,jdbcType=VARCHAR}
+		<if test="names!=null">
+		AND (
+		(
+			CASE #{locationType,jdbcType=INTEGER} 
+			WHEN 0 then location_tmp.quare_id
+			WHEN 1 then location_tmp.province_id
+			WHEN 2 then location_tmp.city_id
+			WHEN 3 then location_tmp.county_id
+			END
+		) in
+			<foreach collection="names" item="name" index="index" open="(" close=")" separator=",">
+				#{name}
+			</foreach>
+		or (
+			CASE #{locationType,jdbcType=INTEGER} 
+			WHEN 0 then location_tmp.quare_id
+			WHEN 1 then location_tmp.province_id
+			WHEN 2 then location_tmp.city_id
+			WHEN 3 then location_tmp.county_id
+			END
+		) is null)
+		</if>
+		AND site.id in 
+   	 	<foreach collection="blockSite" item="site" index="index" open="(" close=")" separator=",">
+    		#{site}
+   	 	</foreach>
+		GROUP BY display_name
+  </select>
+  
+  
+  <select id="getWeather" parameterType="java.util.Map" resultType="java.util.Map">
+	select * from weather inner join site on weather.fk_location_id = site.fk_location_id where site.id=#{siteId,jdbcType=INTEGER} and weather.date = #{date,jdbcType=VARCHAR}
+  </select>
+  <select id="getSubject" parameterType="java.util.Map" resultType="java.util.Map">
+	select * from `subject` where site_id = #{siteId,jdbcType=INTEGER} and start_time &lt;= #{date,jdbcType=VARCHAR} and end_time >= #{date,jdbcType=VARCHAR};
+  </select>
+  <select id="getHoliday" parameterType="java.util.Map" resultType="java.util.Map">
+	select * from `holiday` where start_date &lt;= #{date,jdbcType=VARCHAR} and end_date >= #{date,jdbcType=VARCHAR};
+  </select>
+  <select id="getPeriodSubjectAndHoliday" parameterType="java.util.Map" resultType="java.util.Map">
+	select name from subject inner join site on subject.site_id=site.id where NOT(end_time &lt; #{startTime,jdbcType=VARCHAR} or start_time > #{endTime,jdbcType=VARCHAR})
+	and case #{findSite,jdbcType=VARCHAR} WHEN 0 THEN site_id = #{siteId,jdbcType=VARCHAR} WHEN 1 THEN parent_id = #{siteId,jdbcType=VARCHAR} END
+	union ALL
+	select name from holiday where NOT(end_date &lt; #{startTime,jdbcType=VARCHAR} or start_date > #{endTime,jdbcType=VARCHAR});
+  </select>
+  <select  id="getAcreage" parameterType="java.util.Map" resultType="java.lang.String">
+  	SELECT sum(operation_acreage) from site where CASE #{findchild,jdbcType=INTEGER} WHEN 0 THEN id = #{siteId,jdbcType=INTEGER} WHEN 1 THEN parent_id=#{siteId,jdbcType=INTEGER} END;
+  </select>
+  <select  id="getTrueStartTime" parameterType="java.util.Map" resultType="java.lang.String">
+  	SELECT min(start_time) from opening_time_tmp where date = DATE_FORMAT(#{startTime,jdbcType=VARCHAR},'%Y-%m-%d') and fk_site_id=#{siteId,jdbcType=INTEGER};
+  </select>
+  <select  id="getTrueEndTime" parameterType="java.util.Map" resultType="java.lang.String">
+  	SELECT max(end_time) from opening_time_tmp where date = DATE_FORMAT(#{startTime,jdbcType=VARCHAR},'%Y-%m-%d') and fk_site_id=#{siteId,jdbcType=INTEGER};
+  </select>
+</mapper>

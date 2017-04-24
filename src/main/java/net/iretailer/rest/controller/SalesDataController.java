@@ -33,6 +33,7 @@ public class SalesDataController {
 	@RequestMapping(value="/newSalesData", method = RequestMethod.GET)
 	public Map<String,Object> newSalesData() throws ParseException{
 		if (!roleService.blockRole(request,50)) return ReturnMapUtil.packData("恶意登录");
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date time = sdf.parse(request.getParameter("time"));
 		Float countSales = Float.parseFloat(request.getParameter("countSales"));
@@ -44,10 +45,13 @@ public class SalesDataController {
 	}
 	
 	@RequestMapping(value="/deleteSalesData", method = RequestMethod.GET)
-	public Map<String,Object> deleteSalesData(){
+	public Map<String,Object> deleteSalesData() throws ParseException{
 		if (!roleService.blockRole(request,50)) return ReturnMapUtil.packData("恶意登录");
 		Integer id = Integer.parseInt(request.getParameter("id"));
-		salesDataService.deleteSalesData(id);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date time = sdf.parse(request.getParameter("time"));
+		Short devicezoneId = Short.parseShort(request.getParameter("devicezoneId"));
+		salesDataService.deleteSalesData(time,devicezoneId);
 		return ReturnMapUtil.packData("0");
 	}
 	
