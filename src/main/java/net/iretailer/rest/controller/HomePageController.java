@@ -219,10 +219,10 @@ public class HomePageController {
 		//停留人数数据
 		stayMap.put("name", "停留人数");
 		stayMap.put("summary", "人");
-		stayMap.put("num",Math.abs(nowEnter-nowExit));
+		stayMap.put("num",nowEnter-nowExit);
 		stayMap.put("id", 4);
-		Integer todayStay = Math.abs(nowEnter-nowExit);
-		Integer comparisonStay = Math.abs(compareEnter-compareExit);
+		Integer todayStay = nowEnter-nowExit;
+		Integer comparisonStay = compareEnter-compareExit;
 		if (comparisonStay!=0){
 			change = df.format((todayStay-comparisonStay)*100/comparisonStay);
 		}
